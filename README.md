@@ -1,1 +1,1 @@
-# launch_school_rb101
+# This repo will contain my work for Launch School's RB101 course.
