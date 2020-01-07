@@ -1,0 +1,13 @@
+welcome: "Welcome to the Car Loan Calculator! Enter your name:"
+valid_name: "Make sure to enter a valid name."
+total_loan: How much is the total dollar amount of your car loan? (No dollar sign or commas please)
+apr_rate: "What percentage is your Annual Percentage Rate (APR)? (no pecentage sign needed)"
+loan_duration_in_months: "What is the loan duration in months?"
+invalid_number: "Hmm... that doesn't look like a valid number."
+loan_recap: ""
+another_number: "Do you want to perform another calculation? (Y to calculate again)"
+end_program: "Thank you for using the Car Loan Calculator! Good bye!"
+
+
+# monthly_payment: "How much are you paying each month? (No dollar sign or commas please)"
+# interest_rate: "What is the interest rate? (No percentage sign needed)"
