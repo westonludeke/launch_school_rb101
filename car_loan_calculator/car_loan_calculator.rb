@@ -70,11 +70,9 @@ loop do # main loop
   prompt("Thanks! To recap: You took out a total loan of $#{total_loan}.")
   prompt("The duration of the loan is #{loan_duration_in_months} months.")
   prompt("Your API rate is #{apr_rate}%.")
-  # round up monthly interest rate
-  monthly_int_before = (monthly_int_rate.to_f * 100)
-  # make monthly interest rate a whole percentage
-  month_int = format('%2f', monthly_int_before)
-  prompt("Your monthly interest rate is #{month_int}%.")
+  # round up monthly interest rate 
+  monthly_int = (monthly_int_rate.to_f * 100)
+  prompt("Your monthly interest rate is #{monthly_int}%.")
   # Calculate monthly payment amount, split onto two lines
   calc_one = (1 - (1 + monthly_int_rate.to_f)**-loan_duration_in_months.to_f)
   monthly_payment = total_loan.to_f * (monthly_int_rate.to_f / calc_one)
