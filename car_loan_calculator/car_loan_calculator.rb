@@ -7,7 +7,9 @@ def prompt(message)
 end
 
 def valid_number?(num)
-  true if Float(num) rescue false
+  true if Float(num)
+rescue ArgumentError
+  false
 end
 
 prompt(MESSAGES['welcome'])
@@ -17,7 +19,7 @@ loop do
   name = Kernel.gets.chomp
 
   if name.empty?
-    prompt("Make sure to enter a valid name.")
+    prompt('Make sure to enter a valid name.')
   else
     break
   end
@@ -74,15 +76,15 @@ loop do # main loop
   month_int = format('%2f', monthly_int_before)
   prompt("Your monthly interest rate is #{month_int}%.")
   # Calculate monthly payment amount, split onto two lines
-  calc_one = (1 - (1 + monthly_int_rate.to_f)**(-loan_duration_in_months.to_f))
+  calc_one = (1 - (1 + monthly_int_rate.to_f)**-loan_duration_in_months.to_f)
   monthly_payment = total_loan.to_f * (monthly_int_rate.to_f / calc_one)
   # Round up or down the monthly payment amount
   adjusted_monthly_payment = format('%.2f', monthly_payment)
   prompt("Your monthly payment is $#{adjusted_monthly_payment}.")
 
-  prompt("Do you want to perform another calculation? (Y to calculate again)")
+  prompt('Do you want to perform another calculation? (Y to calculate again)')
   answer = Kernel.gets.chomp
-  break unless answer.downcase().start_with?('y')
+  break unless answer.downcase.start_with?('y')
 end
 
-prompt("Thank you for using the Car Loan Calculator! Good bye!")
+prompt('Thank you for using the Car Loan Calculator! Good bye!')
