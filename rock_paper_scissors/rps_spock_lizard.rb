@@ -23,7 +23,7 @@ def display_results(player, computer)
   elsif win?(computer, player)
     prompt('Computer won!')
   else
-    prompt("It's a draw! Tie game.")
+    prompt("It's a tie game!.")
   end
 end
 
@@ -31,7 +31,19 @@ loop do
   choice = ''
   loop do
     prompt("Choose one: #{VALID_CHOICES.join(', ')}")
-    choice = Kernel.gets.chomp
+    player_choice = Kernel.gets.chomp
+
+    if player_choice.downcase.start_with?('r')
+      choice = "rock"
+    elsif player_choice.downcase.start_with?('p')
+      choice = "paper"
+    elsif player_choice.downcase.start_with?('sc')
+      choice = "scissors"
+    elsif player_choice.downcase.start_with?('sp')
+      choice = "spock"
+    elsif player_choice.downcase.start_with?('l')
+      choice = "lizard"
+    end
 
     if VALID_CHOICES.include?(choice)
       break
