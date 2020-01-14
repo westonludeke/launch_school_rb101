@@ -17,13 +17,18 @@ def win?(first, second)
     (first == 'rock' && second == 'scissors')
 end
 
+@player_score = 0
+@computer_score = 0
 def display_results(player, computer)
   if win?(player, computer)
-    prompt('You won!')
+    @player_score += 1
+    prompt("You won! You now have #{@player_score} points!")
   elsif win?(computer, player)
-    prompt('Computer won!')
+    @computer_score += 1
+    prompt("Computer won! The computer now has #{@computer_score} points.")
   else
-    prompt("It's a tie game!.")
+    prompt("It's a tie game!. You remain at #{@player_score} points.")
+    prompt("The computer remains at #{@computer_score} points.")
   end
 end
 
@@ -63,4 +68,5 @@ loop do
   break unless answer.downcase.start_with?('y')
 end
 
-prompt('Thank you for playing. Good bye!')
+prompt("Thanks for playing! You finished with #{@player_score} total points.")
+prompt("The computer finished with #{@computer_score} total points. Good bye!")
