@@ -1,3 +1,12 @@
+# Game intro and explanation
+puts '=> Welcome to the Rock, Paper, Scissors, Lizard, Spock game!'
+puts '=> First to five points wins!'
+puts '=> How it works:', "....for 'Rock' you can simply type 'R'"
+puts "....for 'Paper' you can type 'P'"
+puts "....for 'Scissors' you can type an 'X'"
+puts "....for 'Spock' you can type 'S'"
+puts "....and for 'Lizard' you can type 'L'"
+
 VALID_CHOICES = %w(rock paper scissors lizard spock)
 
 def prompt(message)
@@ -17,43 +26,43 @@ def win?(first, second)
     (first == 'rock' && second == 'scissors')
 end
 
-@player_score = 0
-@computer_score = 0
 def display_results(player, computer)
   if win?(player, computer)
-    @player_score += 1
-    prompt("You won! You now have #{@player_score} points!")
+    prompt('You won!')
   elsif win?(computer, player)
-    @computer_score += 1
-    prompt("Computer won! The computer now has #{@computer_score} points.")
+    prompt('Computer won!')
   else
-    prompt("It's a tie game!. You remain at #{@player_score} points.")
-    prompt("The computer remains at #{@computer_score} points.")
+    prompt("It's a tie game!")
   end
 end
 
+player_score = ''
+computer_score = ''
+
+player_score = 0
+computer_score = 0
 loop do
   choice = ''
   loop do
-    prompt("Choose one: #{VALID_CHOICES.join(', ')}")
+    prompt("Make your selection: #{VALID_CHOICES.join(', ')}")
     player_choice = Kernel.gets.chomp
 
     if player_choice.downcase.start_with?('r')
-      choice = "rock"
+      choice = 'rock'
     elsif player_choice.downcase.start_with?('p')
-      choice = "paper"
-    elsif player_choice.downcase.start_with?('sc')
-      choice = "scissors"
-    elsif player_choice.downcase.start_with?('sp')
-      choice = "spock"
+      choice = 'paper'
+    elsif player_choice.downcase.start_with?('x')
+      choice = 'scissors'
+    elsif player_choice.downcase.start_with?('s')
+      choice = 'spock'
     elsif player_choice.downcase.start_with?('l')
-      choice = "lizard"
+      choice = 'lizard'
     end
 
     if VALID_CHOICES.include?(choice)
       break
     else
-      prompt("That's not a valid choice.")
+      prompt("That's not a valid choice. Please try again!")
     end
   end
 
@@ -61,12 +70,23 @@ loop do
 
   display_results(choice, computer_choice)
 
+  if win?(choice, computer_choice)
+    player_score += 1
+  elsif win?(computer_choice, choice)
+    computer_score += 1
+  else
+    prompt('The score will remain the same.')
+  end
+
   prompt("You chose #{choice}. The computer chose #{computer_choice}")
+  prompt("You now have #{player_score} points.")
+  prompt("The computer has #{computer_score} points.")
+  break if player_score == 5 || computer_score == 5
 
   prompt('Do you want to play again?')
   answer = Kernel.gets.chomp
   break unless answer.downcase.start_with?('y')
 end
 
-prompt("Thanks for playing! You finished with #{@player_score} total points.")
-prompt("The computer finished with #{@computer_score} total points. Good bye!")
+prompt("Thanks for playing! You finished with #{player_score} total points.")
+prompt("The computer finished with #{computer_score} total points. Good bye!")
