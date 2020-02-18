@@ -24,14 +24,31 @@ munsters = {
 6. If the Age is 18-64, change the Age_Group to Adult
 7. Else Age_Group is Senior
 
+---- NEXT STEPS ------
+
+Find out how to look up the age value for each member of the Munster family and return the output to the console.
+
 =end
 
-case munsters
-when -> (h) { h["age"] == 32}
-  puts 'something'
-else
-  puts 'something else'
+
+munsters.transform_values do |value|
+  if value["age"] >= 65
+    value["age_group"] = "senior"
+  elsif value["age"] > 17 && value["age"] < 65
+    value["age_group"] = "adult"
+  else
+    value["age_group"] = "kid"
+  end
 end
+
+p munsters
+
+# case munsters
+# when -> (h) { h["age"] == 32}
+#   puts 'something'
+# else
+#   puts 'something else'
+# end
 
 
 # This code is to access the Nested Hash and add a new Key and Value
