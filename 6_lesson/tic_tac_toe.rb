@@ -1,5 +1,4 @@
-# We want to build a single player Tic Tac Toe game.
-# A user can play against the computer.
+# A single player Tic Tac Toe game.
 require 'pry'
 
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
@@ -14,6 +13,7 @@ def prompt(msg)
 end
 
 # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+# This displays the Tic Tac Toe board with the selections filled out as the game progresses
 def display_board(brd)
   system 'clear'
   puts "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
@@ -33,20 +33,52 @@ def display_board(brd)
 end
 # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
+# This creates a new, empty board to start the game
 def initialize_board
   new_board = {}
   (1..9).each { |num| new_board[num] = INITIAL_MARKER }
   new_board
 end
 
+# This makes all of the squares empty
 def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
+# This method cleans up the prompt
+def joinor(arr, punc = ", ", or_and = "or")
+  new_arr = []
+  # Convert all integers in the array to a string
+  arr.map! do |val|
+    val.to_s
+  end
+  # Removes the last array item
+  last = arr.pop
+  
+  if arr.length > 1
+    arr.each do |value|
+      new_arr << value + punc
+    end
+  else 
+    arr.each do |value|
+      new_arr << value + " "
+    end
+  end 
+
+  if arr.length == 0
+    new_arr << last
+  else 
+    new_arr << or_and + " " + last
+  end
+  new_arr.join("")
+end
+
+# This gets the player's selection and marks it on the board.
 def player_places_piece!(brd)
   square = ''
   loop do
-    prompt "Choose a square (#{empty_squares(brd).join(', ')}):"
+    #prompt "Choose a square (#{empty_squares(brd).join(', ')}):"
+    prompt "Choose a square: #{joinor(empty_squares(brd))}:"
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
     prompt "Sorry, that's not a valid choice."
@@ -54,11 +86,13 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+# This gets the computer's selection and marks it on the board.
 def computer_places_piece!(brd)
   square = empty_squares(brd).sample
   brd[square] = COMPUTER_MARKER
 end
 
+# Sees if the entire board has been filled out
 def board_full?(brd)
   empty_squares(brd).empty?
 end
@@ -67,6 +101,7 @@ def someone_won?(brd)
   !!detect_winner(brd)
 end
 
+# This is to find out who won the game, if there's a winner.
 def detect_winner(brd)
   WINNING_LINES.each do |line|
     if brd.values_at(*line).count(PLAYER_MARKER) == 3
