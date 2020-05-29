@@ -113,32 +113,53 @@ def detect_winner(brd)
   nil
 end
 
-loop do
-  board = initialize_board
+scoreboard = []
+player_score = 0
+computer_score = 0
 
-  loop do
+loop do 
+  until player_score == 1 || computer_score == 5
+    board = initialize_board
+    loop do
+      display_board(board)
+
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+
+      computer_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    end
     display_board(board)
 
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
+    if someone_won?(board)
+      prompt "The #{detect_winner(board)} won!"
+      scoreboard << detect_winner(board)
+    else
+      prompt "It's a tie!"
+    end
 
-    computer_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
+    player_score = scoreboard.count("Player")
+    computer_score = scoreboard.count("Computer")
+
+    prompt "The Player currently has #{player_score} wins vs the Computer's #{computer_score} wins."
+    
+    if player_score < 1 && computer_score < 5
+      prompt "The next round will begin soon!"
+    end
+    # Delay to show the current score before resetting the board
+    sleep 5
   end
-
-  display_board(board)
-
-  if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
-  else
-    prompt "It's a tie!"
-  end
-
+  binding.pry
   prompt "Would you like to play again? (y or n)"
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
 end
 
+if player_score == 1
+  prompt "The player has won! Good job."
+elsif computer_score == 5
+  prompt "The computer won. Better luck next time."
+end 
 prompt "Thanks for playing Tic Tac Toe! Goodbye!"
 
 # rubocop:disable Metrics/LineLength
