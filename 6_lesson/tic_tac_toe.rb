@@ -113,12 +113,12 @@ def detect_winner(brd)
   nil
 end
 
-scoreboard = []
-player_score = 0
-computer_score = 0
+def play
+  scoreboard = []
+  player_score = 0
+  computer_score = 0 
 
-loop do 
-  until player_score == 1 || computer_score == 5
+  until player_score == 5 || computer_score == 5
     board = initialize_board
     loop do
       display_board(board)
@@ -132,7 +132,7 @@ loop do
     display_board(board)
 
     if someone_won?(board)
-      prompt "The #{detect_winner(board)} won!"
+      prompt "The #{detect_winner(board)} won this round!"
       scoreboard << detect_winner(board)
     else
       prompt "It's a tie!"
@@ -140,26 +140,32 @@ loop do
 
     player_score = scoreboard.count("Player")
     computer_score = scoreboard.count("Computer")
-
-    prompt "The Player currently has #{player_score} wins vs the Computer's #{computer_score} wins."
     
-    if player_score < 1 && computer_score < 5
+    if player_score < 5 && computer_score < 5
+      prompt "The Player currently has #{player_score} wins vs the Computer's #{computer_score} wins."
       prompt "The next round will begin soon!"
+    else
+      prompt "We have game winner! Calculating final scores now..."
     end
     # Delay to show the current score before resetting the board
     sleep 5
   end
-  binding.pry
-  prompt "Would you like to play again? (y or n)"
-  answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
+  # Final Score Count
+  if player_score == 5
+    prompt "The player has won the game with #{player_score} victories against the computer's #{computer_score} wins. Good job!"
+  elsif computer_score == 5
+    prompt "The computer has won the game with #{computer_score} victories against your #{player_score} wins. Better luck next time."
+  end 
 end
 
-if player_score == 1
-  prompt "The player has won! Good job."
-elsif computer_score == 5
-  prompt "The computer won. Better luck next time."
-end 
+play
+
+prompt "Would you like to play again? (y or n)"
+answer = gets.chomp
+if answer.downcase.start_with?('y')
+  play
+end
+
 prompt "Thanks for playing Tic Tac Toe! Goodbye!"
 
 # rubocop:disable Metrics/LineLength
