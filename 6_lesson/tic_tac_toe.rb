@@ -93,17 +93,39 @@ def computer_places_piece!(brd)
     square = 5
     brd[square] = COMPUTER_MARKER
   end
-  # If the player is about to win, the computer makes a smart selection in an attempt to block the player's victory.
   # If the computer is about to win, the computer makes a smart selection in order to seal victory.
   WINNING_LINES.each do |line|
     # The latter half of the each equation ensures that the computer doesn't make two selections.
-    if ((brd.values_at(*line).count(COMPUTER_MARKER) == 2 && brd.values.count('X') > brd.values.count('O')) ||
-      (brd.values_at(*line).count(PLAYER_MARKER) == 2 && brd.values.count('X') > brd.values.count('O')))
+    if (
+      brd.values_at(*line).count(COMPUTER_MARKER) == 2 && 
+      brd.values_at(*line).count(PLAYER_MARKER) == 0 && 
+      brd.values.count('X') > brd.values.count('O')
+      )
+      #prompt "computer ftw"
       line.each do |comp_choice|
         if brd.key?(comp_choice)
           if brd.values_at(comp_choice)[0] == " "
             square = comp_choice
-            prompt "square is: #{square}"
+            #prompt "top square is: #{square}"
+            brd[square] = COMPUTER_MARKER
+          end
+        end
+      end
+    end
+  end   
+  # If the player is about to win, the computer makes a smart selection in an attempt to block the player's victory.
+  WINNING_LINES.each do |line|
+    if (
+      brd.values_at(*line).count(PLAYER_MARKER) == 2 && 
+      brd.values_at(*line).count(COMPUTER_MARKER) == 0 &&
+      brd.values.count('X') > brd.values.count('O')
+      )
+      #prompt "block player"
+      line.each do |comp_choice|
+        if brd.key?(comp_choice)
+          if brd.values_at(comp_choice)[0] == " "
+            square = comp_choice
+            #prompt "bottom square is: #{square}"
             brd[square] = COMPUTER_MARKER
           end
         end
@@ -112,10 +134,11 @@ def computer_places_piece!(brd)
   end
   # The computer makes a random selection, only if it's the computer's turn. i.e. Only if the computer hasn't made a smart selection above.
   if brd.values.count('X') != brd.values.count('O')
+    #prompt "random selection"
     square = empty_squares(brd).sample
     brd[square] = COMPUTER_MARKER
   end
-  #sleep 5
+  #sleep 2
 end
 
 # Sees if the entire board has been filled out
@@ -181,9 +204,9 @@ def play
   end
   # Final Score Count
   if player_score == 5
-    prompt "The player has won the game with #{player_score} victories against the computer's #{computer_score} wins. Good job!"
+    prompt "The player has won the game with #{player_score} wins against the computer's #{computer_score} wins and #{tie_games} ties. Good job!"
   elsif computer_score == 5
-    prompt "The computer has won the game with #{computer_score} victories against your #{player_score} wins. Better luck next time."
+    prompt "The computer has won the game with #{computer_score} victories against your #{player_score} wins and #{tie_games} ties. Better luck next time."
   end 
 end
 
