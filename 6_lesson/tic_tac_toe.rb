@@ -88,15 +88,22 @@ end
 
 # This gets the computer's selection and marks it on the board.
 def computer_places_piece!(brd)
+  # Computer selects 5 if available
+  if brd.values_at(5)[0] == ' '
+    square = 5
+    brd[square] = COMPUTER_MARKER
+  end
   # If the player is about to win, the computer makes a smart selection in an attempt to block the player's victory.
   # If the computer is about to win, the computer makes a smart selection in order to seal victory.
   WINNING_LINES.each do |line|
     # The latter half of the each equation ensures that the computer doesn't make two selections.
-    if (brd.values_at(*line).count(PLAYER_MARKER) == 2 && brd.values.count('X') > brd.values.count('O')) || (brd.values_at(*line).count(COMPUTER_MARKER) == 2 && brd.values.count('X') > brd.values.count('O'))
+    if ((brd.values_at(*line).count(COMPUTER_MARKER) == 2 && brd.values.count('X') > brd.values.count('O')) ||
+      (brd.values_at(*line).count(PLAYER_MARKER) == 2 && brd.values.count('X') > brd.values.count('O')))
       line.each do |comp_choice|
         if brd.key?(comp_choice)
           if brd.values_at(comp_choice)[0] == " "
             square = comp_choice
+            prompt "square is: #{square}"
             brd[square] = COMPUTER_MARKER
           end
         end
