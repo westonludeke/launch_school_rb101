@@ -88,8 +88,11 @@ end
 
 # This gets the computer's selection and marks it on the board.
 def computer_places_piece!(brd)
+  # If the player is about to win, the computer makes a smart selection in an attempt to block the player's victory.
+  # If the computer is about to win, the computer makes a smart selection in order to seal victory.
   WINNING_LINES.each do |line|
-    if brd.values_at(*line).count(PLAYER_MARKER) == 2 && brd.values.count('X') > brd.values.count('O')
+    # The latter half of the each equation ensures that the computer doesn't make two selections.
+    if (brd.values_at(*line).count(PLAYER_MARKER) == 2 && brd.values.count('X') > brd.values.count('O')) || (brd.values_at(*line).count(COMPUTER_MARKER) == 2 && brd.values.count('X') > brd.values.count('O'))
       line.each do |comp_choice|
         if brd.key?(comp_choice)
           if brd.values_at(comp_choice)[0] == " "
@@ -100,6 +103,7 @@ def computer_places_piece!(brd)
       end
     end
   end
+  # The computer makes a random selection, only if it's the computer's turn. i.e. Only if the computer hasn't made a smart selection above.
   if brd.values.count('X') != brd.values.count('O')
     square = empty_squares(brd).sample
     brd[square] = COMPUTER_MARKER
@@ -133,6 +137,7 @@ def play
   scoreboard = []
   player_score = 0
   computer_score = 0 
+  tie_games = 0
 
   until player_score == 5 || computer_score == 5
     board = initialize_board
@@ -151,6 +156,7 @@ def play
       prompt "The #{detect_winner(board)} won this round!"
       scoreboard << detect_winner(board)
     else
+      tie_games += 1
       prompt "It's a tie!"
     end
 
@@ -158,7 +164,7 @@ def play
     computer_score = scoreboard.count("Computer")
     
     if player_score < 5 && computer_score < 5
-      prompt "The Player currently has #{player_score} wins vs the Computer's #{computer_score} wins."
+      prompt "The Player currently has #{player_score} wins. The computer has #{computer_score} wins. There have been #{tie_games} ties."
       prompt "The next round will begin soon!"
     else
       prompt "We have game winner! Calculating final scores now..."
