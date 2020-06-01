@@ -88,8 +88,23 @@ end
 
 # This gets the computer's selection and marks it on the board.
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
-  brd[square] = COMPUTER_MARKER
+  WINNING_LINES.each do |line|
+    if brd.values_at(*line).count(PLAYER_MARKER) == 2 && brd.values.count('X') > brd.values.count('O')
+      line.each do |comp_choice|
+        if brd.key?(comp_choice)
+          if brd.values_at(comp_choice)[0] == " "
+            square = comp_choice
+            brd[square] = COMPUTER_MARKER
+          end
+        end
+      end
+    end
+  end
+  if brd.values.count('X') != brd.values.count('O')
+    square = empty_squares(brd).sample
+    brd[square] = COMPUTER_MARKER
+  end
+  #sleep 5
 end
 
 # Sees if the entire board has been filled out
@@ -104,6 +119,7 @@ end
 # This is to find out who won the game, if there's a winner.
 def detect_winner(brd)
   WINNING_LINES.each do |line|
+    # 
     if brd.values_at(*line).count(PLAYER_MARKER) == 3
       return 'Player'
     elsif brd.values_at(*line).count(COMPUTER_MARKER) == 3
@@ -112,7 +128,7 @@ def detect_winner(brd)
   end
   nil
 end
-
+# ---- SCORING ----
 def play
   scoreboard = []
   player_score = 0
