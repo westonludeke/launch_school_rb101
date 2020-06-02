@@ -77,7 +77,6 @@ end
 def player_places_piece!(brd)
   square = ''
   loop do
-    #prompt "Choose a square (#{empty_squares(brd).join(', ')}):"
     prompt "Choose a square: #{joinor(empty_squares(brd))}:"
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
@@ -101,12 +100,10 @@ def computer_places_piece!(brd)
       brd.values_at(*line).count(PLAYER_MARKER) == 0 && 
       brd.values.count('X') > brd.values.count('O')
       )
-      #prompt "computer ftw"
       line.each do |comp_choice|
         if brd.key?(comp_choice)
           if brd.values_at(comp_choice)[0] == " "
             square = comp_choice
-            #prompt "top square is: #{square}"
             brd[square] = COMPUTER_MARKER
           end
         end
@@ -120,12 +117,10 @@ def computer_places_piece!(brd)
       brd.values_at(*line).count(COMPUTER_MARKER) == 0 &&
       brd.values.count('X') > brd.values.count('O')
       )
-      #prompt "block player"
       line.each do |comp_choice|
         if brd.key?(comp_choice)
           if brd.values_at(comp_choice)[0] == " "
             square = comp_choice
-            #prompt "bottom square is: #{square}"
             brd[square] = COMPUTER_MARKER
           end
         end
@@ -134,11 +129,9 @@ def computer_places_piece!(brd)
   end
   # The computer makes a random selection, only if it's the computer's turn. i.e. Only if the computer hasn't made a smart selection above.
   if brd.values.count('X') != brd.values.count('O')
-    #prompt "random selection"
     square = empty_squares(brd).sample
     brd[square] = COMPUTER_MARKER
   end
-  #sleep 2
 end
 
 # Sees if the entire board has been filled out
