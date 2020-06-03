@@ -177,14 +177,14 @@ def computer_places_piece!(brd)
   # The computer makes a random selection, only if it's the computer's turn. i.e. Only if the computer hasn't made a smart selection above.
   if @beginner == 'Player'
     if brd.values.count('X') > brd.values.count('O')
-      prompt "The Computer makes a random selection"
+      prompt "The Computer is making a random selection"
       sleep 3
       square = empty_squares(brd).sample
       brd[square] = COMPUTER_MARKER
     end
   elsif @beginner == 'Computer'
     if brd.values.count('X') == brd.values.count('O')
-      prompt "The Computer makes a random selection"
+      prompt "The Computer is making a random selection"
       sleep 3
       square = empty_squares(brd).sample
       brd[square] = COMPUTER_MARKER
