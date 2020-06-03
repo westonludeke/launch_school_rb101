@@ -8,10 +8,12 @@ INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 
+@total_score = 1
+@beginner = ''
+
 def prompt(msg)
   puts "=> #{msg}"
 end
-
 # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
 # This displays the Tic Tac Toe board with the selections filled out as the game progresses
 def display_board(brd)
@@ -33,19 +35,19 @@ def display_board(brd)
 end
 # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
-# This creates a new, empty board to start the game
+# This creates a new, empty board to start the round
 def initialize_board
   new_board = {}
   (1..9).each { |num| new_board[num] = INITIAL_MARKER }
   new_board
 end
 
-# This makes all of the squares empty
+# This makes all of the squares on the board empty
 def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
-# This method cleans up the prompt
+# This method cleans up the prompt, listing the empty squares available.
 def joinor(arr, punc = ", ", or_and = "or")
   new_arr = []
   # Convert all integers in the array to a string
@@ -72,8 +74,16 @@ def joinor(arr, punc = ", ", or_and = "or")
   end
   new_arr.join("")
 end
-
-# This gets the player's selection and marks it on the board.
+# ---- WHO STARTS THE ROUND ----
+def who_starts
+  if @total_score.even?
+    @beginner = 'Player'
+  else
+    @beginner = 'CPU'
+  end
+end
+who_starts
+# ---- PLAYER SELECTIONS ----
 def player_places_piece!(brd)
   square = ''
   loop do
@@ -85,12 +95,15 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-# This gets the computer's selection and marks it on the board.
+# ---- COMPUTER SELECTIONS ----
 def computer_places_piece!(brd)
   # Computer selects 5 if available
   if brd.values_at(5)[0] == ' '
+    prompt "CPU selects 5"
+    sleep 3
     square = 5
     brd[square] = COMPUTER_MARKER
+
   end
   # If the computer is about to win, the computer makes a smart selection in order to seal victory.
   WINNING_LINES.each do |line|
@@ -100,6 +113,8 @@ def computer_places_piece!(brd)
       brd.values_at(*line).count(PLAYER_MARKER) == 0 && 
       brd.values.count('X') > brd.values.count('O')
       )
+      prompt "Computer goes for the win"
+      sleep 3
       line.each do |comp_choice|
         if brd.key?(comp_choice)
           if brd.values_at(comp_choice)[0] == " "
@@ -117,6 +132,8 @@ def computer_places_piece!(brd)
       brd.values_at(*line).count(COMPUTER_MARKER) == 0 &&
       brd.values.count('X') > brd.values.count('O')
       )
+      prompt "Computer blocks the player"
+      sleep 3
       line.each do |comp_choice|
         if brd.key?(comp_choice)
           if brd.values_at(comp_choice)[0] == " "
@@ -128,10 +145,22 @@ def computer_places_piece!(brd)
     end
   end
   # The computer makes a random selection, only if it's the computer's turn. i.e. Only if the computer hasn't made a smart selection above.
-  if brd.values.count('X') != brd.values.count('O')
-    square = empty_squares(brd).sample
-    brd[square] = COMPUTER_MARKER
+  if @beginner == 'Player'
+    if brd.values.count('X') > brd.values.count('O')
+      prompt "Random selection: Player goes first"
+      sleep 3
+      square = empty_squares(brd).sample
+      brd[square] = COMPUTER_MARKER
+    end
+  elsif @beginner == 'CPU'
+    if brd.values.count('X') == brd.values.count('O')
+      prompt "Random selection: Computer goes first"
+      sleep 3
+      square = empty_squares(brd).sample
+      brd[square] = COMPUTER_MARKER
+    end
   end
+  display_board(brd)
 end
 
 # Sees if the entire board has been filled out
@@ -161,19 +190,68 @@ def play
   player_score = 0
   computer_score = 0 
   tie_games = 0
-
+  # Keep going until either player or CPU reaches 5 wins
   until player_score == 5 || computer_score == 5
+    # total score
+    prompt "Total score is: #{@total_score}"
+    prompt "Beginner is: #{@beginner}"
+    sleep 3
+    # show empty board at the beginning of the round
     board = initialize_board
-    loop do
-      display_board(board)
+    # Loop of selections
+    if @beginner == 'Player' 
+      loop do
+        display_board(board)
 
-      player_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
+        player_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
 
-      computer_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
+        computer_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+      end
+    elsif @beginner == 'CPU'
+      loop do
+        display_board(board)
+
+        computer_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+
+        player_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+        # NOT SURE IF NEEDED
+        display_board(board)
+      end
     end
     display_board(board)
+    # loop do
+      
+    #   display_board(board)
+    #   total_score = (player_score + computer_score + tie_games)
+    #   prompt "Total score is #{total_score}"
+    #   prompt "Player score is #{player_score}"
+    #   prompt "CPU score is #{computer_score}"
+    #   # If/else statement to alternate turns each round between the player and the computer
+    #   # if total_score.even?
+    #     #prompt "Player goes first!"
+    #     #player_places_piece!(board)
+    #     computer_places_piece!(board)
+    #     break if someone_won?(board) || board_full?(board)
+    #     #computer_places_piece!(board)
+    #     display_board(board)
+    #     player_places_piece!(board)
+    #     break if someone_won?(board) || board_full?(board)
+    #     display_board(board)
+    #   # else
+    #     # prompt "CPU goes first!"
+    #     # computer_places_piece!(board)
+    #     # break if someone_won?(board) || board_full?(board)
+
+    #     # player_places_piece!(board)
+    #     # break if someone_won?(board) || board_full?(board)        
+    #   #end
+    # end
+
+    #display_board(board)
 
     if someone_won?(board)
       prompt "The #{detect_winner(board)} won this round!"
@@ -185,10 +263,12 @@ def play
 
     player_score = scoreboard.count("Player")
     computer_score = scoreboard.count("Computer")
+    @total_score = (player_score + computer_score + tie_games)
     
     if player_score < 5 && computer_score < 5
       prompt "The Player currently has #{player_score} wins. The computer has #{computer_score} wins. There have been #{tie_games} ties."
       prompt "The next round will begin soon!"
+      who_starts
     else
       prompt "We have game winner! Calculating final scores now..."
     end
@@ -204,13 +284,12 @@ def play
 end
 
 play
-
+# ----  REPEAT OR END GAME ----
 prompt "Would you like to play again? (y or n)"
 answer = gets.chomp
 if answer.downcase.start_with?('y')
   play
 end
-
 prompt "Thanks for playing Tic Tac Toe! Goodbye!"
 
 # rubocop:disable Metrics/LineLength

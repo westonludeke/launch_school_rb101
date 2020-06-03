@@ -1,23 +1,294 @@
+# A single player Tic Tac Toe game.
+require 'pry'
+
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
                 [[1, 5, 9], [3, 5, 7]] # diagonals
-COMPUTER_MARKER = 'O'
+INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
+COMPUTER_MARKER = 'O'
 
-brd = {1 => 'X', 2 => 'X', 3 => ' ', 4 => 'O'}
+@total_score = 1
+@beginner = ''
 
-#p brd.values.count('X') > brd.values.count('O')
+def prompt(msg)
+  puts "=> #{msg}"
+end
+# rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+# This displays the Tic Tac Toe board with the selections filled out as the game progresses
+def display_board(brd)
+  system 'clear'
+  puts "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
+  puts ""
+  puts "     |     |"
+  puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
+  puts "     |     |"
+  puts "-----+-----+-----"
+  puts "     |     |"
+  puts "  #{brd[4]}  |  #{brd[5]}  |  #{brd[6]}"
+  puts "     |     |"
+  puts "-----+-----+-----"
+  puts "     |     |"
+  puts "  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}"
+  puts "     |     |"
+  puts ""
+end
+# rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
-p brd.values_at(*line).count('X') == 2 && brd.values_at(*line).count('O') == 0
-# if (brd.values_at(*line).count(COMPUTER_MARKER) == 2 && brd.values.count('X') > brd.values.count('O')) || 
-#    (brd.values_at(*line).count(PLAYER_MARKER) == 2 && brd.values.count('X') > brd.values.count('O'))
-   
-#   line.each do |comp_choice|
-#     if brd.key?(comp_choice)
-#       if brd.values_at(comp_choice)[0] == " "
-#         square = comp_choice
-#         brd[square] = COMPUTER_MARKER
-#       end
-#     end
-#   end
-# end
+# This creates a new, empty board to start the round
+def initialize_board
+  new_board = {}
+  (1..9).each { |num| new_board[num] = INITIAL_MARKER }
+  new_board
+end
+
+# This makes all of the squares on the board empty
+def empty_squares(brd)
+  brd.keys.select { |num| brd[num] == INITIAL_MARKER }
+end
+
+# This method cleans up the prompt, listing the empty squares available.
+def joinor(arr, punc = ", ", or_and = "or")
+  new_arr = []
+  # Convert all integers in the array to a string
+  arr.map! do |val|
+    val.to_s
+  end
+  # Removes the last array item
+  last = arr.pop
+  
+  if arr.length > 1
+    arr.each do |value|
+      new_arr << value + punc
+    end
+  else 
+    arr.each do |value|
+      new_arr << value + " "
+    end
+  end 
+
+  if arr.length == 0
+    new_arr << last
+  else 
+    new_arr << or_and + " " + last
+  end
+  new_arr.join("")
+end
+# ---- WHO STARTS THE ROUND ----
+def who_starts
+  if @total_score.even?
+    @beginner = 'Player'
+  else
+    @beginner = 'CPU'
+  end
+end
+who_starts
+# ---- PLAYER SELECTIONS ----
+def player_places_piece!(brd)
+  square = ''
+  loop do
+    prompt "Choose a square: #{joinor(empty_squares(brd))}:"
+    square = gets.chomp.to_i
+    break if empty_squares(brd).include?(square)
+    prompt "Sorry, that's not a valid choice."
+  end
+  brd[square] = PLAYER_MARKER
+end
+
+# ---- COMPUTER SELECTIONS ----
+def computer_places_piece!(brd)
+  # Computer selects 5 if available
+  if brd.values_at(5)[0] == ' '
+    prompt "CPU selects 5"
+    sleep 3
+    square = 5
+    brd[square] = COMPUTER_MARKER
+
+  end
+  # If the computer is about to win, the computer makes a smart selection in order to seal victory.
+  WINNING_LINES.each do |line|
+    # The latter half of the each equation ensures that the computer doesn't make two selections.
+    if (
+      brd.values_at(*line).count(COMPUTER_MARKER) == 2 && 
+      brd.values_at(*line).count(PLAYER_MARKER) == 0 && 
+      brd.values.count('X') > brd.values.count('O')
+      )
+      prompt "Computer goes for the win"
+      sleep 3
+      line.each do |comp_choice|
+        if brd.key?(comp_choice)
+          if brd.values_at(comp_choice)[0] == " "
+            square = comp_choice
+            brd[square] = COMPUTER_MARKER
+          end
+        end
+      end
+    end
+  end   
+  # If the player is about to win, the computer makes a smart selection in an attempt to block the player's victory.
+  WINNING_LINES.each do |line|
+    if (
+      brd.values_at(*line).count(PLAYER_MARKER) == 2 && 
+      brd.values_at(*line).count(COMPUTER_MARKER) == 0 &&
+      brd.values.count('X') > brd.values.count('O')
+      )
+      prompt "Computer blocks the player"
+      sleep 3
+      line.each do |comp_choice|
+        if brd.key?(comp_choice)
+          if brd.values_at(comp_choice)[0] == " "
+            square = comp_choice
+            brd[square] = COMPUTER_MARKER
+          end
+        end
+      end
+    end
+  end
+  # The computer makes a random selection, only if it's the computer's turn. i.e. Only if the computer hasn't made a smart selection above.
+  if @beginner == 'Player'
+    if brd.values.count('X') > brd.values.count('O')
+      prompt "Random selection: Player goes first"
+      sleep 3
+      square = empty_squares(brd).sample
+      brd[square] = COMPUTER_MARKER
+    end
+  elsif @beginner == 'CPU'
+    if brd.values.count('X') == brd.values.count('O')
+      prompt "Random selection: Computer goes first"
+      sleep 3
+      square = empty_squares(brd).sample
+      brd[square] = COMPUTER_MARKER
+    end
+  end
+  display_board(brd)
+end
+
+# Sees if the entire board has been filled out
+def board_full?(brd)
+  empty_squares(brd).empty?
+end
+
+def someone_won?(brd)
+  !!detect_winner(brd)
+end
+
+# This is to find out who won the game, if there's a winner.
+def detect_winner(brd)
+  WINNING_LINES.each do |line|
+    # 
+    if brd.values_at(*line).count(PLAYER_MARKER) == 3
+      return 'Player'
+    elsif brd.values_at(*line).count(COMPUTER_MARKER) == 3
+      return 'Computer'
+    end
+  end
+  nil
+end
+# ---- SCORING ----
+def play
+  scoreboard = []
+  player_score = 0
+  computer_score = 0 
+  tie_games = 0
+  # Keep going until either player or CPU reaches 5 wins
+  until player_score == 5 || computer_score == 5
+    # total score
+    prompt "Total score is: #{@total_score}"
+    prompt "Beginner is: #{@beginner}"
+    sleep 3
+    # show empty board at the beginning of the round
+    board = initialize_board
+    # Loop of selections
+    if @beginner == 'Player' 
+      loop do
+        display_board(board)
+
+        player_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+
+        computer_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+      end
+    elsif @beginner == 'CPU'
+      loop do
+        display_board(board)
+
+        computer_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+
+        player_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+        # NOT SURE IF NEEDED
+        display_board(board)
+      end
+    end
+    display_board(board)
+    # loop do
+      
+    #   display_board(board)
+    #   total_score = (player_score + computer_score + tie_games)
+    #   prompt "Total score is #{total_score}"
+    #   prompt "Player score is #{player_score}"
+    #   prompt "CPU score is #{computer_score}"
+    #   # If/else statement to alternate turns each round between the player and the computer
+    #   # if total_score.even?
+    #     #prompt "Player goes first!"
+    #     #player_places_piece!(board)
+    #     computer_places_piece!(board)
+    #     break if someone_won?(board) || board_full?(board)
+    #     #computer_places_piece!(board)
+    #     display_board(board)
+    #     player_places_piece!(board)
+    #     break if someone_won?(board) || board_full?(board)
+    #     display_board(board)
+    #   # else
+    #     # prompt "CPU goes first!"
+    #     # computer_places_piece!(board)
+    #     # break if someone_won?(board) || board_full?(board)
+
+    #     # player_places_piece!(board)
+    #     # break if someone_won?(board) || board_full?(board)        
+    #   #end
+    # end
+
+    #display_board(board)
+
+    if someone_won?(board)
+      prompt "The #{detect_winner(board)} won this round!"
+      scoreboard << detect_winner(board)
+    else
+      tie_games += 1
+      prompt "It's a tie!"
+    end
+
+    player_score = scoreboard.count("Player")
+    computer_score = scoreboard.count("Computer")
+    @total_score = (player_score + computer_score + tie_games)
+    
+    if player_score < 5 && computer_score < 5
+      prompt "The Player currently has #{player_score} wins. The computer has #{computer_score} wins. There have been #{tie_games} ties."
+      prompt "The next round will begin soon!"
+      who_starts
+    else
+      prompt "We have game winner! Calculating final scores now..."
+    end
+    # Delay to show the current score before resetting the board
+    sleep 5
+  end
+  # Final Score Count
+  if player_score == 5
+    prompt "The player has won the game with #{player_score} wins against the computer's #{computer_score} wins and #{tie_games} ties. Good job!"
+  elsif computer_score == 5
+    prompt "The computer has won the game with #{computer_score} victories against your #{player_score} wins and #{tie_games} ties. Better luck next time."
+  end 
+end
+
+play
+# ----  REPEAT OR END GAME ----
+prompt "Would you like to play again? (y or n)"
+answer = gets.chomp
+if answer.downcase.start_with?('y')
+  play
+end
+prompt "Thanks for playing Tic Tac Toe! Goodbye!"
+
