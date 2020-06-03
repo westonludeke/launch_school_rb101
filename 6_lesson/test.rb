@@ -8,7 +8,7 @@ INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 
-@total_score = 1
+@total_score = 0
 @beginner = ''
 
 def prompt(msg)
@@ -79,7 +79,7 @@ def who_starts
   if @total_score.even?
     @beginner = 'Player'
   else
-    @beginner = 'CPU'
+    @beginner = 'Computer'
   end
 end
 who_starts
@@ -87,7 +87,7 @@ who_starts
 def player_places_piece!(brd)
   square = ''
   loop do
-    prompt "Choose a square: #{joinor(empty_squares(brd))}:"
+    prompt "Player, choose a square: #{joinor(empty_squares(brd))}:"
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
     prompt "Sorry, that's not a valid choice."
@@ -99,7 +99,7 @@ end
 def computer_places_piece!(brd)
   # Computer selects 5 if available
   if brd.values_at(5)[0] == ' '
-    prompt "CPU selects 5"
+    prompt "The Computer selects 5"
     sleep 3
     square = 5
     brd[square] = COMPUTER_MARKER
@@ -108,18 +108,33 @@ def computer_places_piece!(brd)
   # If the computer is about to win, the computer makes a smart selection in order to seal victory.
   WINNING_LINES.each do |line|
     # The latter half of the each equation ensures that the computer doesn't make two selections.
-    if (
-      brd.values_at(*line).count(COMPUTER_MARKER) == 2 && 
-      brd.values_at(*line).count(PLAYER_MARKER) == 0 && 
-      brd.values.count('X') > brd.values.count('O')
-      )
-      prompt "Computer goes for the win"
-      sleep 3
-      line.each do |comp_choice|
-        if brd.key?(comp_choice)
-          if brd.values_at(comp_choice)[0] == " "
+    # --------
+    if @beginner == 'Player'
+      if (brd.values_at(*line).count(COMPUTER_MARKER) == 2 && brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
+      brd.values.count('X') > brd.values.count('O'))
+        prompt "Computer goes for the win"
+        sleep 3
+        line.each do |comp_choice|
+          if brd.key?(comp_choice)
+            if brd.values_at(comp_choice)[0] == " "
+              square = comp_choice
+              brd[square] = COMPUTER_MARKER
+            end
+          end
+        end
+      end
+    # ------
+    elsif @beginner == 'Computer'
+      if (brd.values_at(*line).count(COMPUTER_MARKER) == 2 && brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
+      brd.values.count('X') == brd.values.count('O'))
+        prompt "Computer goes for the win"
+        sleep 3
+        line.each do |comp_choice|
+          if brd.key?(comp_choice)
+            if brd.values_at(comp_choice)[0] == " "
             square = comp_choice
             brd[square] = COMPUTER_MARKER
+            end
           end
         end
       end
@@ -127,18 +142,33 @@ def computer_places_piece!(brd)
   end   
   # If the player is about to win, the computer makes a smart selection in an attempt to block the player's victory.
   WINNING_LINES.each do |line|
-    if (
-      brd.values_at(*line).count(PLAYER_MARKER) == 2 && 
-      brd.values_at(*line).count(COMPUTER_MARKER) == 0 &&
-      brd.values.count('X') > brd.values.count('O')
-      )
-      prompt "Computer blocks the player"
-      sleep 3
-      line.each do |comp_choice|
-        if brd.key?(comp_choice)
-          if brd.values_at(comp_choice)[0] == " "
+    # --------
+    if @beginner == 'Player'
+      if (brd.values_at(*line).count(PLAYER_MARKER) == 2 && brd.values_at(*line).count(COMPUTER_MARKER) == 0 &&
+      brd.values.count('X') > brd.values.count('O'))
+        prompt "Computer blocks the player from winning."
+        sleep 3
+        line.each do |comp_choice|
+          if brd.key?(comp_choice)
+            if brd.values_at(comp_choice)[0] == " "
+              square = comp_choice
+              brd[square] = COMPUTER_MARKER
+            end
+          end
+        end
+      end
+    # ------
+    elsif @beginner == 'Computer'
+      if (brd.values_at(*line).count(PLAYER_MARKER) == 2 && brd.values_at(*line).count(COMPUTER_MARKER) == 0 &&
+      brd.values.count('X') == brd.values.count('O'))
+        prompt "Computer blocks the player from winning."
+        sleep 3
+        line.each do |comp_choice|
+          if brd.key?(comp_choice)
+            if brd.values_at(comp_choice)[0] == " "
             square = comp_choice
             brd[square] = COMPUTER_MARKER
+            end
           end
         end
       end
@@ -147,14 +177,14 @@ def computer_places_piece!(brd)
   # The computer makes a random selection, only if it's the computer's turn. i.e. Only if the computer hasn't made a smart selection above.
   if @beginner == 'Player'
     if brd.values.count('X') > brd.values.count('O')
-      prompt "Random selection: Player goes first"
+      prompt "The Computer makes a random selection"
       sleep 3
       square = empty_squares(brd).sample
       brd[square] = COMPUTER_MARKER
     end
-  elsif @beginner == 'CPU'
+  elsif @beginner == 'Computer'
     if brd.values.count('X') == brd.values.count('O')
-      prompt "Random selection: Computer goes first"
+      prompt "The Computer makes a random selection"
       sleep 3
       square = empty_squares(brd).sample
       brd[square] = COMPUTER_MARKER
@@ -175,7 +205,6 @@ end
 # This is to find out who won the game, if there's a winner.
 def detect_winner(brd)
   WINNING_LINES.each do |line|
-    # 
     if brd.values_at(*line).count(PLAYER_MARKER) == 3
       return 'Player'
     elsif brd.values_at(*line).count(COMPUTER_MARKER) == 3
@@ -193,8 +222,8 @@ def play
   # Keep going until either player or CPU reaches 5 wins
   until player_score == 5 || computer_score == 5
     # total score
-    prompt "Total score is: #{@total_score}"
-    prompt "Beginner is: #{@beginner}"
+    prompt "#{@total_score} rounds have been played so far."
+    prompt "The #{@beginner} will start off this round!"
     sleep 3
     # show empty board at the beginning of the round
     board = initialize_board
@@ -209,7 +238,7 @@ def play
         computer_places_piece!(board)
         break if someone_won?(board) || board_full?(board)
       end
-    elsif @beginner == 'CPU'
+    elsif @beginner == 'Computer'
       loop do
         display_board(board)
 
@@ -223,36 +252,7 @@ def play
       end
     end
     display_board(board)
-    # loop do
-      
-    #   display_board(board)
-    #   total_score = (player_score + computer_score + tie_games)
-    #   prompt "Total score is #{total_score}"
-    #   prompt "Player score is #{player_score}"
-    #   prompt "CPU score is #{computer_score}"
-    #   # If/else statement to alternate turns each round between the player and the computer
-    #   # if total_score.even?
-    #     #prompt "Player goes first!"
-    #     #player_places_piece!(board)
-    #     computer_places_piece!(board)
-    #     break if someone_won?(board) || board_full?(board)
-    #     #computer_places_piece!(board)
-    #     display_board(board)
-    #     player_places_piece!(board)
-    #     break if someone_won?(board) || board_full?(board)
-    #     display_board(board)
-    #   # else
-    #     # prompt "CPU goes first!"
-    #     # computer_places_piece!(board)
-    #     # break if someone_won?(board) || board_full?(board)
-
-    #     # player_places_piece!(board)
-    #     # break if someone_won?(board) || board_full?(board)        
-    #   #end
-    # end
-
-    #display_board(board)
-
+    # ---- SEE IF SOMEONE ONE THE ROUND
     if someone_won?(board)
       prompt "The #{detect_winner(board)} won this round!"
       scoreboard << detect_winner(board)
