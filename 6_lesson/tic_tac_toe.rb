@@ -99,8 +99,8 @@ end
 def computer_places_piece!(brd)
   # Computer selects 5 if available
   if brd.values_at(5)[0] == ' '
-    prompt "The Computer selects 5"
-    sleep 3
+    #prompt "The Computer selects 5"
+   # sleep 3
     square = 5
     brd[square] = COMPUTER_MARKER
 
@@ -112,8 +112,8 @@ def computer_places_piece!(brd)
     if @beginner == 'Player'
       if (brd.values_at(*line).count(COMPUTER_MARKER) == 2 && brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
       brd.values.count('X') > brd.values.count('O'))
-        prompt "Computer goes for the win"
-        sleep 3
+        #prompt "Computer goes for the win"
+        #sleep 3
         line.each do |comp_choice|
           if brd.key?(comp_choice)
             if brd.values_at(comp_choice)[0] == " "
@@ -127,8 +127,8 @@ def computer_places_piece!(brd)
     elsif @beginner == 'Computer'
       if (brd.values_at(*line).count(COMPUTER_MARKER) == 2 && brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
       brd.values.count('X') == brd.values.count('O'))
-        prompt "Computer goes for the win"
-        sleep 3
+        #prompt "Computer goes for the win"
+        #sleep 3
         line.each do |comp_choice|
           if brd.key?(comp_choice)
             if brd.values_at(comp_choice)[0] == " "
@@ -146,8 +146,8 @@ def computer_places_piece!(brd)
     if @beginner == 'Player'
       if (brd.values_at(*line).count(PLAYER_MARKER) == 2 && brd.values_at(*line).count(COMPUTER_MARKER) == 0 &&
       brd.values.count('X') > brd.values.count('O'))
-        prompt "Computer blocks the player from winning."
-        sleep 3
+        #prompt "Computer blocks the player from winning."
+        #sleep 3
         line.each do |comp_choice|
           if brd.key?(comp_choice)
             if brd.values_at(comp_choice)[0] == " "
@@ -161,8 +161,8 @@ def computer_places_piece!(brd)
     elsif @beginner == 'Computer'
       if (brd.values_at(*line).count(PLAYER_MARKER) == 2 && brd.values_at(*line).count(COMPUTER_MARKER) == 0 &&
       brd.values.count('X') == brd.values.count('O'))
-        prompt "Computer blocks the player from winning."
-        sleep 3
+        #prompt "Computer blocks the player from winning."
+        #sleep 3
         line.each do |comp_choice|
           if brd.key?(comp_choice)
             if brd.values_at(comp_choice)[0] == " "
@@ -177,15 +177,15 @@ def computer_places_piece!(brd)
   # The computer makes a random selection, only if it's the computer's turn. i.e. Only if the computer hasn't made a smart selection above.
   if @beginner == 'Player'
     if brd.values.count('X') > brd.values.count('O')
-      prompt "The Computer is making a random selection"
-      sleep 3
+      #prompt "The Computer is making a random selection"
+      #sleep 3
       square = empty_squares(brd).sample
       brd[square] = COMPUTER_MARKER
     end
   elsif @beginner == 'Computer'
     if brd.values.count('X') == brd.values.count('O')
-      prompt "The Computer is making a random selection"
-      sleep 3
+      #prompt "The Computer is making a random selection"
+      #sleep 3
       square = empty_squares(brd).sample
       brd[square] = COMPUTER_MARKER
     end
@@ -291,4 +291,14 @@ if answer.downcase.start_with?('y')
   play
 end
 prompt "Thanks for playing Tic Tac Toe! Goodbye!"
+
+=begin ---- GAME NOTES ----
+
+1. My version of Tic Tac Toe is a little different. Instead of choosing who goes first, my game alternates each round between the player choosing first and the computer choosing first.
+
+2. The code should be cleaned up and more concise (i.e. more DRY) but it works, which was my biggest goal.
+
+3. The computer always makes the most optimal choice for the computer, so it is very hard (but not impossible) to beat the computer.
+  
+=end
 
