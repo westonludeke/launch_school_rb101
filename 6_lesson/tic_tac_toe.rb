@@ -51,11 +51,7 @@ end
 # This method cleans up the prompt, listing the empty squares available.
 def joinor(arr, punc = ", ", or_and = "or")
   new_arr = []
-  # Convert all integers in the array to a string
-  arr.map! do |val|
-    val.to_s
-  end
-  # Removes the last array item
+  arr.map!(&:to_s)
   last = arr.pop
   if arr.length > 1
     arr.each do |value|
@@ -67,21 +63,21 @@ def joinor(arr, punc = ", ", or_and = "or")
     end
   end
 
-  if arr.empty?
-    new_arr << last
-  else
-    new_arr << or_and + " " + last
-  end
+  new_arr << if arr.empty?
+               last
+             else
+               or_and + " " + last
+             end
   new_arr.join("")
 end
 
 # ---- WHO STARTS THE ROUND ----
 def who_starts
-  if @total_score.even?
-    @beginner = 'Player'
-  else
-    @beginner = 'Computer'
-  end
+  @beginner = if @total_score.even?
+                'Player'
+              else
+                'Computer'
+              end
 end
 who_starts
 # ---- PLAYER SELECTIONS ----
@@ -118,11 +114,9 @@ def computer_places_piece!(brd)
         # prompt "Computer goes for the win"
         # sleep 3
         line.each do |comp_choice|
-          if brd.key?(comp_choice)
-            if brd.values_at(comp_choice)[0] == " "
-              square = comp_choice
-              brd[square] = COMPUTER_MARKER
-            end
+          if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
+            square = comp_choice
+            brd[square] = COMPUTER_MARKER
           end
         end
       end
@@ -134,11 +128,9 @@ def computer_places_piece!(brd)
         # prompt "Computer goes for the win"
         # sleep 3
         line.each do |comp_choice|
-          if brd.key?(comp_choice)
-            if brd.values_at(comp_choice)[0] == " "
-              square = comp_choice
-              brd[square] = COMPUTER_MARKER
-            end
+          if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
+            square = comp_choice
+            brd[square] = COMPUTER_MARKER
           end
         end
       end
@@ -155,11 +147,9 @@ def computer_places_piece!(brd)
         # prompt "Computer blocks the player from winning."
         # sleep 3
         line.each do |comp_choice|
-          if brd.key?(comp_choice)
-            if brd.values_at(comp_choice)[0] == " "
-              square = comp_choice
-              brd[square] = COMPUTER_MARKER
-            end
+          if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
+            square = comp_choice
+            brd[square] = COMPUTER_MARKER
           end
         end
       end
@@ -171,11 +161,9 @@ def computer_places_piece!(brd)
         # prompt "Computer blocks the player from winning."
         # sleep 3
         line.each do |comp_choice|
-          if brd.key?(comp_choice)
-            if brd.values_at(comp_choice)[0] == " "
-              square = comp_choice
-              brd[square] = COMPUTER_MARKER
-            end
+          if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
+            square = comp_choice
+            brd[square] = COMPUTER_MARKER
           end
         end
       end
@@ -308,7 +296,8 @@ end
 prompt "Thanks for playing Tic Tac Toe! Goodbye!"
 
 =begin ---- GAME NOTES ----
-1. Each round alternates between the player choosing first and the computer.
-2. The code still needs to be cleaned up and more concise but it works.
+1. Instead of manually choosing who goes first /
+   each round alternates between the player choosing first and the computer.
+2. The code still needs to be refactored, but the gameplay works.
 3. The computer always makes the most optimal choice for the computer.
 =end
