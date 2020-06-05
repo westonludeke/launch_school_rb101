@@ -1,91 +1,126 @@
-# ---- SCORING ----
-def final_score
-  if player_score == 5
-    prompt "The player has won the game with #{player_score} wins" \
-    "against the computer's #{computer_score} wins and #{tie_games} ties." \
-    "Good job!"
-  elsif computer_score == 5
-    prompt "The computer has won the game with #{computer_score} victories" \
-    "against your #{player_score} wins and #{tie_games} ties." \
-    "Better luck next time."
+# ---- COMPUTER SELECTION METHODS ----
+
+# ---- COMPUTER SELECTS #5 ----
+# The computer will always select square #5 first if it's available.
+def computer_selects_five
+  if brd.values_at(5)[0] == ' '
+    # prompt "The Computer selects 5"
+    # sleep 3
+    square = 5
+    brd[square] = COMPUTER_MARKER
   end
 end
 
-def beginning_round_prompt
-  prompt "#{@total_score} rounds have been played so far."
-  prompt "The #{@beginner} will start off this round!"
-  sleep 3
-end
+# ---- COMPUTER GOES FOR THE WIN ----
+# If the computer is about to win,
+# the computer makes a smart selection in order to seal victory.
 
-def end_round_prompt
-  # ---- SEE IF SOMEONE ONE THE ROUND
-    if someone_won?(board)
-      prompt "The #{detect_winner(board)} won this round!"
-      @scoreboard << detect_winner(board)
-    else
-      @tie_games += 1
-      prompt "It's a tie!"
+# If the player started the round, this method seals victory for the CPU
+def computer_seals_victory_player_round
+  if brd.values_at(*line).count(COMPUTER_MARKER) == 2 && \
+     brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
+     brd.values.count('X') > brd.values.count('O')
+    # prompt "Computer goes for the win"
+    # sleep 3
+    line.each do |comp_choice|
+      if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
+        square = comp_choice
+        brd[square] = COMPUTER_MARKER
+      end
     end
-
-    @player_score = @scoreboard.count("Player")
-    @computer_score = @scoreboard.count("Computer")
-    @total_score = (@player_score + @computer_score + @tie_games)
-
-  if @player_score < 5 && @computer_score < 5
-    prompt "The Player currently has #{@player_score} wins." \
-    "The computer has #{@computer_score} wins." \
-    "There have been #{@tie_games} ties."
-    prompt "The next round will begin soon!"
-    who_starts_the_round?
-  else
-    prompt "We have game winner! Calculating final scores now..."
   end
-  # Delay to show the current score before resetting the board
-  sleep 5
 end
 
-def game_scoreboard
-  @scoreboard = []
-  @player_score = 0
-  @computer_score = 0
-  @tie_games = 0
+# If the CPU started the round, this method seals victory for the CPU
+def computer_seals_victory_computer_round
+  if brd.values_at(*line).count(COMPUTER_MARKER) == 2 && \
+     brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
+     brd.values.count('X') == brd.values.count('O')
+     # prompt "Computer goes for the win"
+     # sleep 3
+    line.each do |comp_choice|
+      if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
+        square = comp_choice
+        brd[square] = COMPUTER_MARKER
+      end
+    end
+  end
 end
 
-def keeping_score
-  # Keep going until either player or CPU reaches 5 wins
-  until @player_score == 5 || @computer_score == 5
-    beginning_round_prompt
-    # show empty board at the beginning of the round
-    board = initialize_board
-    # Loop of selections
+# ---- COMPUTER BLOCKS PLAYER VICTORY ----
+# If the player is about to win, CPU blocks the player from victory
+# First if the player began the round
+def block_player_player_round
+  if brd.values_at(*line).count(PLAYER_MARKER) == 2 && \
+     brd.values_at(*line).count(COMPUTER_MARKER) == 0 &&
+     brd.values.count('X') > brd.values.count('O')
+     # prompt "Computer blocks the player from winning."
+     # sleep 3
+    line.each do |comp_choice|
+      if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
+        square = comp_choice
+        brd[square] = COMPUTER_MARKER
+      end
+    end
+  end
+end
+
+# This methid is the CPU started the round
+def block_player_computer_round
+  if brd.values_at(*line).count(PLAYER_MARKER) == 2 && \
+     brd.values_at(*line).count(COMPUTER_MARKER) == 0 && \
+     brd.values.count('X') == brd.values.count('O')
+     # prompt "Computer blocks the player from winning."
+     # sleep 3
+    line.each do |comp_choice|
+      if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
+        square = comp_choice
+        brd[square] = COMPUTER_MARKER
+      end
+    end
+  end
+end
+
+# ---- CPU RANDOM SELECTION ----
+# CPU makes a random selection if no other option available.
+def computer_random_selection
+# The computer makes a random selection, only if it's the computer's turn.
+# i.e. Only if the computer hasn't made a smart selection above.
+  if @beginner == 'Player'
+    if brd.values.count('X') > brd.values.count('O')
+      # prompt "The Computer is making a random selection"
+      # sleep 3
+      square = empty_squares(brd).sample
+      brd[square] = COMPUTER_MARKER
+    end
+  elsif @beginner == 'Computer'
+    if brd.values.count('X') == brd.values.count('O')
+      # prompt "The Computer is making a random selection"
+      # sleep 3
+      square = empty_squares(brd).sample
+      brd[square] = COMPUTER_MARKER
+    end
+  end
+end
+
+# ---- CALLING THE CPU SELECTION METHODS ----
+def computer_places_piece!(brd)
+  computer_selects_five
+  WINNING_LINES.each do |line|
     if @beginner == 'Player'
-      loop do
-        display_board(board)
-
-        player_places_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-
-        computer_places_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-      end
+      computer_seals_victory_player_round
     elsif @beginner == 'Computer'
-      loop do
-        display_board(board)
-
-        computer_places_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-
-        player_places_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-
-        display_board(board)
-      end
+      computer_seals_victory_computer_round
     end
-    display_board(board)
-
-    end_round_prompt    
   end
-  # Final Score Method
-  final_score
+  WINNING_LINES.each do |line|
+    if @beginner == 'Player'
+      block_player_player_round
+    elsif @beginner == 'Computer'
+      block_player_computer_round
+    end
+  end
+  computer_random_selection
+  display_board(brd)
 end
-keeping_score
+

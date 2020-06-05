@@ -68,14 +68,14 @@ def joinor(arr, punc = ", ", or_and = "or")
 end
 
 # ---- WHO STARTS THE ROUND ----
-def who_starts_the_round?
+def who_starts
   @beginner = if @total_score.even?
                 'Player'
               else
                 'Computer'
               end
 end
-who_starts_the_round?
+who_starts
 # ---- PLAYER SELECTIONS ----
 def player_places_piece!(brd)
   square = ''
@@ -207,62 +207,17 @@ def detect_winner(brd)
 end
 
 # ---- SCORING ----
-def final_score
-  if player_score == 5
-    prompt "The player has won the game with #{player_score} wins" \
-    "against the computer's #{computer_score} wins and #{tie_games} ties." \
-    "Good job!"
-  elsif computer_score == 5
-    prompt "The computer has won the game with #{computer_score} victories" \
-    "against your #{player_score} wins and #{tie_games} ties." \
-    "Better luck next time."
-  end
-end
-
-def beginning_round_prompt
-  prompt "#{@total_score} rounds have been played so far."
-  prompt "The #{@beginner} will start off this round!"
-  sleep 3
-end
-
-def end_round_prompt
-  # ---- SEE IF SOMEONE ONE THE ROUND
-    if someone_won?(board)
-      prompt "The #{detect_winner(board)} won this round!"
-      @scoreboard << detect_winner(board)
-    else
-      @tie_games += 1
-      prompt "It's a tie!"
-    end
-
-    @player_score = @scoreboard.count("Player")
-    @computer_score = @scoreboard.count("Computer")
-    @total_score = (@player_score + @computer_score + @tie_games)
-
-  if @player_score < 5 && @computer_score < 5
-    prompt "The Player currently has #{@player_score} wins." \
-    "The computer has #{@computer_score} wins." \
-    "There have been #{@tie_games} ties."
-    prompt "The next round will begin soon!"
-    who_starts_the_round?
-  else
-    prompt "We have game winner! Calculating final scores now..."
-  end
-  # Delay to show the current score before resetting the board
-  sleep 5
-end
-
-def game_scoreboard
-  @scoreboard = []
-  @player_score = 0
-  @computer_score = 0
-  @tie_games = 0
-end
-
-def keeping_score
+def play
+  scoreboard = []
+  player_score = 0
+  computer_score = 0
+  tie_games = 0
   # Keep going until either player or CPU reaches 5 wins
-  until @player_score == 5 || @computer_score == 5
-    beginning_round_prompt
+  until player_score == 5 || computer_score == 5
+    # total score
+    prompt "#{@total_score} rounds have been played so far."
+    prompt "The #{@beginner} will start off this round!"
+    sleep 3
     # show empty board at the beginning of the round
     board = initialize_board
     # Loop of selections
@@ -285,24 +240,54 @@ def keeping_score
 
         player_places_piece!(board)
         break if someone_won?(board) || board_full?(board)
-
+        # NOT SURE IF NEEDED
         display_board(board)
       end
     end
     display_board(board)
+    # ---- SEE IF SOMEONE ONE THE ROUND
+    if someone_won?(board)
+      prompt "The #{detect_winner(board)} won this round!"
+      scoreboard << detect_winner(board)
+    else
+      tie_games += 1
+      prompt "It's a tie!"
+    end
 
-    end_round_prompt    
+    player_score = scoreboard.count("Player")
+    computer_score = scoreboard.count("Computer")
+    @total_score = (player_score + computer_score + tie_games)
+
+    if player_score < 5 && computer_score < 5
+      prompt "The Player currently has #{player_score} wins." \
+      "The computer has #{computer_score} wins." \
+      "There have been #{tie_games} ties."
+      prompt "The next round will begin soon!"
+      who_starts
+    else
+      prompt "We have game winner! Calculating final scores now..."
+    end
+    # Delay to show the current score before resetting the board
+    sleep 5
   end
-  # Final Score Method
-  final_score
+  # Final Score Count
+  if player_score == 5
+    prompt "The player has won the game with #{player_score} wins" \
+    "against the computer's #{computer_score} wins and #{tie_games} ties." \
+    "Good job!"
+  elsif computer_score == 5
+    prompt "The computer has won the game with #{computer_score} victories" \
+    "against your #{player_score} wins and #{tie_games} ties." \
+    "Better luck next time."
+  end
 end
-keeping_score
 
+play
 # ----  REPEAT OR END GAME ----
 prompt "Would you like to play again? (y or n)"
 answer = gets.chomp
 if answer.downcase.start_with?('y')
-  keeping_score
+  play
 end
 prompt "Thanks for playing Tic Tac Toe! Goodbye!"
 
