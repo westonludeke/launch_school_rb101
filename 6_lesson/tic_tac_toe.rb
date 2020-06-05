@@ -207,6 +207,12 @@ def detect_winner(brd)
 end
 
 # ---- SCORING ----
+def beginning_round_prompt
+  prompt "#{@total_score} rounds have been played so far."
+  prompt "The #{@beginner} will start off this round!"
+  sleep 3
+end
+
 def play
   scoreboard = []
   player_score = 0
@@ -215,9 +221,7 @@ def play
   # Keep going until either player or CPU reaches 5 wins
   until player_score == 5 || computer_score == 5
     # total score
-    prompt "#{@total_score} rounds have been played so far."
-    prompt "The #{@beginner} will start off this round!"
-    sleep 3
+    beginning_round_prompt
     # show empty board at the beginning of the round
     board = initialize_board
     # Loop of selections
