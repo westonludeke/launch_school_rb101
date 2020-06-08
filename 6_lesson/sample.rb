@@ -207,10 +207,22 @@ def detect_winner(brd)
 end
 
 # ---- SCORING ----
+def keep_score
+  @scoreboard = []
+  @player_score = 0
+  @computer_score = 0
+  @tie_games = 0
+end
+
 def beginning_round_prompt
   prompt "#{@total_score} rounds have been played so far."
   prompt "The #{@beginner} will start off this round!"
   sleep 3
+end
+
+def winner_round_prompt(board)
+  prompt "The #{detect_winner(board)} won this round!"
+  @scoreboard << detect_winner(board)
 end
 
 def end_round_prompt
@@ -219,13 +231,6 @@ def end_round_prompt
   "There have been #{@tie_games} ties. "
   prompt "The next round will begin soon!"
   who_starts
-end
-
-def keep_score
-  @scoreboard = []
-  @player_score = 0
-  @computer_score = 0
-  @tie_games = 0
 end
 
 def winner_check
@@ -276,17 +281,13 @@ def play
 
         player_places_piece!(board)
         break if someone_won?(board) || board_full?(board)
-        # NOT SURE IF NEEDED
         display_board(board)
       end
     end
     display_board(board)
     # ---- SEE IF SOMEONE ONE THE ROUND
     if someone_won?(board)
-      prompt "The #{detect_winner(board)} won this round!"
-      #@scoreboard << detect_winner(board)
-      round_winner = detect_winner(board)
-      @scoreboard << round_winner
+      winner_round_prompt(board)
     else
       @tie_games += 1
       prompt "It's a tie!"
