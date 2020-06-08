@@ -213,9 +213,13 @@ def beginning_round_prompt
   sleep 3
 end
 
-# def end_round_prompt
-
-# end
+def end_round_prompt
+  prompt "The Player currently has #{@player_score} wins. " \
+  "The computer has #{@computer_score} wins. " \
+  "There have been #{@tie_games} ties. "
+  prompt "The next round will begin soon!"
+  who_starts
+end
 
 def keep_score
   @scoreboard = []
@@ -282,8 +286,6 @@ def play
       prompt "The #{detect_winner(board)} won this round!"
       #@scoreboard << detect_winner(board)
       round_winner = detect_winner(board)
-      p round_winner
-      sleep 2
       @scoreboard << round_winner
     else
       @tie_games += 1
@@ -295,11 +297,7 @@ def play
     @total_score = (@player_score + @computer_score + @tie_games)
 
     if @player_score < 5 && @computer_score < 5
-      prompt "The Player currently has #{@player_score} wins." \
-      "The computer has #{@computer_score} wins." \
-      "There have been #{@tie_games} ties."
-      prompt "The next round will begin soon!"
-      who_starts
+      end_round_prompt
     else
       prompt "We have game winner! Calculating final scores now..."
     end
