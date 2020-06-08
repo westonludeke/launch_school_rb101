@@ -98,43 +98,50 @@ def computer_selects_five(brd)
   end
 end
 
+def computer_win_player_started_round(brd, line)
+  if brd.values_at(*line).count(COMPUTER_MARKER) == 2 && \
+     brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
+     brd.values.count('X') > brd.values.count('O')
+   
+    line.each do |comp_choice|
+      if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
+        square = comp_choice
+        brd[square] = COMPUTER_MARKER
+      end
+    end
+  end
+end
+
+def computer_win_computer_started_round(brd, line)
+  if brd.values_at(*line).count(COMPUTER_MARKER) == 2 && \
+     brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
+     brd.values.count('X') == brd.values.count('O')
+    
+    line.each do |comp_choice|
+      if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
+        square = comp_choice
+        brd[square] = COMPUTER_MARKER
+      end
+    end
+  end
+end
+
+def computer_seals_victory(brd)
+  WINNING_LINES.each do |line|
+    if @beginner == 'Player'
+      computer_win_player_started_round(brd, line)
+    elsif @beginner == 'Computer'
+      computer_win_computer_started_round(brd, line)
+    end
+  end
+end
+
 def computer_places_piece!(brd)
   # Computer selects 5 if available
   computer_selects_five(brd)
   # If the computer is about to win:
   # The computer makes a smart selection in order to seal victory.
-  WINNING_LINES.each do |line|
-    # The latter half of the each equation:
-    # Ensures that the computer doesn't make two selections.
-    if @beginner == 'Player'
-      if brd.values_at(*line).count(COMPUTER_MARKER) == 2 && \
-         brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
-         brd.values.count('X') > brd.values.count('O')
-        # prompt "Computer goes for the win"
-        # sleep 3
-        line.each do |comp_choice|
-          if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
-            square = comp_choice
-            brd[square] = COMPUTER_MARKER
-          end
-        end
-      end
-    # ------
-    elsif @beginner == 'Computer'
-      if brd.values_at(*line).count(COMPUTER_MARKER) == 2 && \
-         brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
-         brd.values.count('X') == brd.values.count('O')
-        # prompt "Computer goes for the win"
-        # sleep 3
-        line.each do |comp_choice|
-          if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
-            square = comp_choice
-            brd[square] = COMPUTER_MARKER
-          end
-        end
-      end
-    end
-  end
+  computer_seals_victory(brd)
   # If the player is about to win, the computer makes a smart selection
   # in an attempt to block the player's victory.
   WINNING_LINES.each do |line|
