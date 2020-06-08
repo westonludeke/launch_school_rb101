@@ -76,6 +76,7 @@ def who_starts
               end
 end
 who_starts
+
 # ---- PLAYER SELECTIONS ----
 def player_places_piece!(brd)
   square = ''
@@ -89,15 +90,17 @@ def player_places_piece!(brd)
 end
 
 # ---- COMPUTER SELECTIONS ----
-def computer_places_piece!(brd)
-  # Computer selects 5 if available
+
+def computer_selects_five(brd)
   if brd.values_at(5)[0] == ' '
-    # prompt "The Computer selects 5"
-    # sleep 3
     square = 5
     brd[square] = COMPUTER_MARKER
-
   end
+end
+
+def computer_places_piece!(brd)
+  # Computer selects 5 if available
+  computer_selects_five(brd)
   # If the computer is about to win:
   # The computer makes a smart selection in order to seal victory.
   WINNING_LINES.each do |line|
