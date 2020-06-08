@@ -206,7 +206,7 @@ def detect_winner(brd)
   nil
 end
 
-# ---- SCORING ----
+# ---- SCORING AND GAMEPLAY ----
 def keep_score
   @scoreboard = []
   @player_score = 0
@@ -246,7 +246,6 @@ def begin_computer_loop(board)
 end
 
 def selection_loop(board)
-  # Loop of selections
   if @beginner == 'Player'
     begin_player_loop(board)
   elsif @beginner == 'Computer'
@@ -263,6 +262,15 @@ end
 def tie_round_prompt
   @tie_games += 1
   prompt "It's a tie!"
+end
+
+def score_check
+  if @player_score < 5 && @computer_score < 5
+    end_round_prompt
+  else
+    prompt "We have game winner! Calculating final scores now..."
+  end
+  sleep 5
 end
 
 def end_round_prompt
@@ -301,7 +309,6 @@ end
 
 def play
   keep_score
-  # Keep going until either player or CPU reaches 5 wins
   until @player_score == 5 || @computer_score == 5
     beginning_round_prompt
     # show empty board at the beginning of the round
@@ -313,15 +320,8 @@ def play
     else
       tie_round_prompt
     end
-
     end_round_score_update
-
-    if @player_score < 5 && @computer_score < 5
-      end_round_prompt
-    else
-      prompt "We have game winner! Calculating final scores now..."
-    end
-    sleep 5
+    score_check    
   end
   winner_check
 end
