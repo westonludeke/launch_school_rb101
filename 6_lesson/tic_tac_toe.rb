@@ -250,12 +250,23 @@ def winner_round_prompt(board)
   @scoreboard << detect_winner(board)
 end
 
+def tie_round_prompt
+  @tie_games += 1
+  prompt "It's a tie!"
+end
+
 def end_round_prompt
   prompt "The Player currently has #{@player_score} wins. " \
   "The computer has #{@computer_score} wins. " \
   "There have been #{@tie_games} ties. "
   prompt "The next round will begin soon!"
   who_starts
+end
+
+def end_round_score_update
+  @player_score = @scoreboard.count("Player")
+  @computer_score = @scoreboard.count("Computer")
+  @total_score = (@player_score + @computer_score + @tie_games)
 end
 
 def winner_check
@@ -282,7 +293,6 @@ def play
   keep_score
   # Keep going until either player or CPU reaches 5 wins
   until @player_score == 5 || @computer_score == 5
-    # total score
     beginning_round_prompt
     # show empty board at the beginning of the round
     board = initialize_board
@@ -297,20 +307,16 @@ def play
     if someone_won?(board)
       winner_round_prompt(board)
     else
-      @tie_games += 1
-      prompt "It's a tie!"
+      tie_round_prompt
     end
 
-    @player_score = @scoreboard.count("Player")
-    @computer_score = @scoreboard.count("Computer")
-    @total_score = (@player_score + @computer_score + @tie_games)
+    end_round_score_update
 
     if @player_score < 5 && @computer_score < 5
       end_round_prompt
     else
       prompt "We have game winner! Calculating final scores now..."
     end
-    # Delay to show the current score before resetting the board
     sleep 5
   end
   winner_check
