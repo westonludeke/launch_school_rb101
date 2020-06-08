@@ -251,7 +251,7 @@ def selection_loop(board)
   elsif @beginner == 'Computer'
     begin_computer_loop(board)
   end
-    display_board(board)
+  display_board(board)
 end
 
 def winner_round_prompt(board)
@@ -321,7 +321,7 @@ def play
       tie_round_prompt
     end
     end_round_score_update
-    score_check    
+    score_check
   end
   winner_check
 end
