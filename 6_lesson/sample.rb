@@ -224,6 +224,14 @@ def keep_score
   @tie_games = 0
 end
 
+def winner_check
+  if @player_score == 5
+    player_won_game
+  elsif @computer_score == 5
+    computer_won_game
+  end
+end
+
 def player_won_game
   prompt "The player has won the game with #{@player_score} wins" \
   "against the computer's #{@computer_score} wins and #{@tie_games} ties." \
@@ -298,18 +306,7 @@ def play
     # Delay to show the current score before resetting the board
     sleep 5
   end
-  # Final Score Count
-  if @player_score == 5
-    # prompt "The player has won the game with #{player_score} wins" \
-    # "against the computer's #{computer_score} wins and #{tie_games} ties." \
-    # "Good job!"
-    player_won_game
-  elsif @computer_score == 5
-    # prompt "The computer has won the game with #{computer_score} victories " \
-    # "against your #{player_score} wins and #{tie_games} ties. " \
-    # "Better luck next time."
-    computer_won_game
-  end
+  winner_check
 end
 
 play
