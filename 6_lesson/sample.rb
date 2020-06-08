@@ -220,6 +220,31 @@ def beginning_round_prompt
   sleep 3
 end
 
+def begin_player_loop(board)
+  loop do
+    display_board(board)
+
+    player_places_piece!(board)
+    break if someone_won?(board) || board_full?(board)
+
+    computer_places_piece!(board)
+    break if someone_won?(board) || board_full?(board)
+  end
+end
+
+def begin_computer_loop(board)
+  loop do
+    display_board(board)
+
+    computer_places_piece!(board)
+    break if someone_won?(board) || board_full?(board)
+
+    player_places_piece!(board)
+    break if someone_won?(board) || board_full?(board)
+    display_board(board)
+  end
+end
+
 def winner_round_prompt(board)
   prompt "The #{detect_winner(board)} won this round!"
   @scoreboard << detect_winner(board)
@@ -263,26 +288,9 @@ def play
     board = initialize_board
     # Loop of selections
     if @beginner == 'Player'
-      loop do
-        display_board(board)
-
-        player_places_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-
-        computer_places_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-      end
+      begin_player_loop(board)
     elsif @beginner == 'Computer'
-      loop do
-        display_board(board)
-
-        computer_places_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-
-        player_places_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-        display_board(board)
-      end
+      begin_computer_loop(board)
     end
     display_board(board)
     # ---- SEE IF SOMEONE ONE THE ROUND
