@@ -245,6 +245,16 @@ def begin_computer_loop(board)
   end
 end
 
+def selection_loop(board)
+  # Loop of selections
+  if @beginner == 'Player'
+    begin_player_loop(board)
+  elsif @beginner == 'Computer'
+    begin_computer_loop(board)
+  end
+    display_board(board)
+end
+
 def winner_round_prompt(board)
   prompt "The #{detect_winner(board)} won this round!"
   @scoreboard << detect_winner(board)
@@ -296,13 +306,7 @@ def play
     beginning_round_prompt
     # show empty board at the beginning of the round
     board = initialize_board
-    # Loop of selections
-    if @beginner == 'Player'
-      begin_player_loop(board)
-    elsif @beginner == 'Computer'
-      begin_computer_loop(board)
-    end
-    display_board(board)
+    selection_loop(board)
     # ---- SEE IF SOMEONE ONE THE ROUND
     if someone_won?(board)
       winner_round_prompt(board)
