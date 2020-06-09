@@ -17,10 +17,6 @@ Rubocop tests.
 
 =begin ---- TO-DO LIST ----
 
-1. Display to the user how many round points one must earn to win the game.
-
-2. Input 5.2 was considered valid but shouldn't be. Only integer values 1-9 are proper board fields.
-
 3. One small issue you could address with your code is that the program indicates an answer of y or n is accepted when asking whether the user is ready to play. In reality, the program will accept any input beginning with y or n, meaning that 'yellow' will be accepted as 'yes' and 'now' is accepted as no…
 
 4. Finally, it would be good to clear the screen after each round.
@@ -116,11 +112,11 @@ def player_places_piece!(brd)
   square = ''
   loop do
     prompt "Player, choose a square: #{joinor(empty_squares(brd))}:"
-    square = gets.chomp.to_i
-    break if empty_squares(brd).include?(square)
+    square = gets.chomp.to_f
+    break if empty_squares(brd).include?(square) && square % 1 == 0
     prompt "Sorry, that's not a valid choice."
   end
-  brd[square] = PLAYER_MARKER
+  brd[square.to_i] = PLAYER_MARKER
 end
 
 # ---- COMPUTER SELECTIONS ----
@@ -359,9 +355,13 @@ end
 
 play
 
-prompt "Would you like to play again? (y or n)"
-answer = gets.chomp
-if answer.downcase.start_with?('y')
-  play
-end
-prompt "Thanks for playing Tic Tac Toe! Goodbye!"
+def play_again
+  @total_score = 0
+  prompt "Would you like to play again? (y or n)"
+  answer = gets.chomp
+  if answer.downcase.start_with?('y')
+    play
+  end
+  prompt "Thanks for playing Tic Tac Toe! Goodbye!"
+end 
+play_again
