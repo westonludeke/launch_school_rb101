@@ -19,25 +19,19 @@ face_values.each do |val|
     i += 1
   end
 end
-# Shuffle the deck
-shuffled_cards = remaining_cards.shuffle!
-p "The deck contains #{remaining_cards.length} cards."
-player_cards << remaining_cards.pop
-dealer_cards << remaining_cards.pop
+# Shuffle the deck and draw cards
+def shuffle_and_draw
+  shuffled_cards = remaining_cards.shuffle!
+  p "The deck contains #{remaining_cards.length} cards."
+  player_cards << remaining_cards.pop
+  dealer_cards << remaining_cards.pop
 
-p "The player has: #{player_cards}"
-p "The dealer has: #{dealer_cards}"
-
+  p "The player has: #{player_cards}"
+  p "The dealer has: #{dealer_cards}"
+end
+shuffle_and_draw
 # Calculate points for player
 player_point = player_cards[0][1]
-
-# if player_point.is_a? Integer
-#   player_cards_total_value += player_point
-# elsif player_point == 'jack' || player_point == 'queen' || player_point == 'king'
-#   player_cards_total_value += 10
-# elsif player_point == 'ace'
-#   player_cards_total_value += 11
-# end
 
 if player_point == 'ace' 
   if player_cards_total_value + 11 <= 21

@@ -44,6 +44,12 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
+def welcome
+  prompt "Welcome to Tic Tac Toe!"
+  prompt "First to win five rounds wins the game."
+  sleep 3
+end
+
 # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
 # This displays the Tic Tac Toe board
 def display_board(brd)
@@ -237,6 +243,9 @@ def keep_score
 end
 
 def beginning_round_prompt
+  if @total_score == 0
+    welcome
+  end
   prompt "#{@total_score} rounds have been played so far."
   prompt "The #{@beginner} will start off this round!"
   sleep 3
