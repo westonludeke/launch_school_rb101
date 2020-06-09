@@ -14,6 +14,20 @@ properly refactor without them.
 Rubocop tests.
 
 =end
+
+=begin ---- TO-DO LIST ----
+
+1. Display to the user how many round points one must earn to win the game.
+
+2. Input 5.2 was considered valid but shouldn't be. Only integer values 1-9 are proper board fields.
+
+3. One small issue you could address with your code is that the program indicates an answer of y or n is accepted when asking whether the user is ready to play. In reality, the program will accept any input beginning with y or n, meaning that 'yellow' will be accepted as 'yes' and 'now' is accepted as no…
+
+4. Finally, it would be good to clear the screen after each round.
+
+
+=end
+
 require 'pry'
 
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
