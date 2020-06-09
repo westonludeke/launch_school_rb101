@@ -1,4 +1,19 @@
-# A single player Tic Tac Toe game.
+=begin  ---- A single player Tic Tac Toe game ----
+
+ ---- GAME NOTES ----
+1. Instead of manually choosing who goes first /
+   each round alternates between the player choosing first and the computer.
+
+2. The computer always makes the most optimal choice for the computer.
+  2a. This means always selecting space #5 if available.
+
+3. I used instance variables for scoring because I didn't know how to /
+properly refactor without them.
+
+4. The code isn't nearly as DRY as it should be, but passes all of the /
+Rubocop tests.
+
+=end
 require 'pry'
 
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
@@ -67,7 +82,6 @@ def joinor(arr, punc = ", ", or_and = "or")
   new_arr.join("")
 end
 
-# ---- WHO STARTS THE ROUND ----
 def who_starts
   @beginner = if @total_score.even?
                 'Player'
@@ -181,7 +195,6 @@ def computer_places_piece!(brd)
   display_board(brd)
 end
 
-# Sees if the entire board has been filled out
 def board_full?(brd)
   empty_squares(brd).empty?
 end
@@ -190,7 +203,6 @@ def someone_won?(brd)
   !!detect_winner(brd)
 end
 
-# This is to find out who won the game, if there's a winner.
 def detect_winner(brd)
   WINNING_LINES.each do |line|
     if brd.values_at(*line).count(PLAYER_MARKER) == 3
@@ -310,7 +322,7 @@ def play
     # show empty board at the beginning of the round
     board = initialize_board
     selection_loop(board)
-    # ---- SEE IF SOMEONE ONE THE ROUND
+
     if someone_won?(board)
       winner_round_prompt(board)
     else
@@ -323,17 +335,10 @@ def play
 end
 
 play
-# ----  REPEAT OR END GAME ----
+
 prompt "Would you like to play again? (y or n)"
 answer = gets.chomp
 if answer.downcase.start_with?('y')
   play
 end
 prompt "Thanks for playing Tic Tac Toe! Goodbye!"
-
-=begin ---- GAME NOTES ----
-1. Instead of manually choosing who goes first /
-   each round alternates between the player choosing first and the computer.
-2. The code still needs to be refactored, but the gameplay works.
-3. The computer always makes the most optimal choice for the computer.
-=end
