@@ -21,7 +21,6 @@ Rubocop tests.
 
 4. Finally, it would be good to clear the screen after each round.
 
-
 =end
 
 require 'pry'
@@ -359,7 +358,7 @@ def play_again
   @total_score = 0
   prompt "Would you like to play again? (y or n)"
   answer = gets.chomp
-  if answer.downcase.start_with?('y')
+  if answer.downcase == ('y') || answer.downcase == ('yes')
     play
   end
   prompt "Thanks for playing Tic Tac Toe! Goodbye!"
