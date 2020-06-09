@@ -107,6 +107,20 @@ def computer_choice(brd, line)
   end
 end
 
+def computer_random_choice(brd)
+  if @beginner == 'Player'
+    if brd.values.count('X') > brd.values.count('O')
+      square = empty_squares(brd).sample
+      brd[square] = COMPUTER_MARKER
+    end
+  elsif @beginner == 'Computer'
+    if brd.values.count('X') == brd.values.count('O')
+      square = empty_squares(brd).sample
+      brd[square] = COMPUTER_MARKER
+    end
+  end
+end
+
 def computer_win_player_started_round(brd, line)
   if brd.values_at(*line).count(COMPUTER_MARKER) == 2 && \
      brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
@@ -136,61 +150,26 @@ def computer_seals_victory(brd)
 end
 
 def computer_places_piece!(brd)
-  # Computer selects 5 if available
   computer_selects_five(brd)
-  # If the computer is about to win:
-  # The computer makes a smart selection in order to seal victory.
   computer_seals_victory(brd)
-  # If the player is about to win, the computer makes a smart selection
-  # in an attempt to block the player's victory.
+  # If the player is about to win, the computer makes a smart selection, in an attempt to block the player's victory.
   WINNING_LINES.each do |line|
-    # --------
     if @beginner == 'Player'
       if brd.values_at(*line).count(PLAYER_MARKER) == 2 && \
          brd.values_at(*line).count(COMPUTER_MARKER) == 0 &&
          brd.values.count('X') > brd.values.count('O')
-        # prompt "Computer blocks the player from winning."
-        # sleep 3
-        line.each do |comp_choice|
-          if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
-            square = comp_choice
-            brd[square] = COMPUTER_MARKER
-          end
-        end
+        computer_choice(brd, line)
       end
     # ------
     elsif @beginner == 'Computer'
       if brd.values_at(*line).count(PLAYER_MARKER) == 2 && \
          brd.values_at(*line).count(COMPUTER_MARKER) == 0 && \
          brd.values.count('X') == brd.values.count('O')
-        # prompt "Computer blocks the player from winning."
-        # sleep 3
-        line.each do |comp_choice|
-          if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
-            square = comp_choice
-            brd[square] = COMPUTER_MARKER
-          end
-        end
+        computer_choice(brd, line)
       end
     end
   end
-  # The computer makes a random selection, only if it's the computer's turn.
-  # i.e. Only if the computer hasn't made a smart selection above.
-  if @beginner == 'Player'
-    if brd.values.count('X') > brd.values.count('O')
-      # prompt "The Computer is making a random selection"
-      # sleep 3
-      square = empty_squares(brd).sample
-      brd[square] = COMPUTER_MARKER
-    end
-  elsif @beginner == 'Computer'
-    if brd.values.count('X') == brd.values.count('O')
-      # prompt "The Computer is making a random selection"
-      # sleep 3
-      square = empty_squares(brd).sample
-      brd[square] = COMPUTER_MARKER
-    end
-  end
+  computer_random_choice(brd)
   display_board(brd)
 end
 
