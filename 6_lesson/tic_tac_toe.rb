@@ -17,8 +17,6 @@ Rubocop tests.
 
 =begin ---- TO-DO LIST ----
 
-3. One small issue you could address with your code is that the program indicates an answer of y or n is accepted when asking whether the user is ready to play. In reality, the program will accept any input beginning with y or n, meaning that 'yellow' will be accepted as 'yes' and 'now' is accepted as no…
-
 4. Finally, it would be good to clear the screen after each round.
 
 =end
@@ -31,6 +29,7 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
+GAME_ROUNDS = 5
 
 @total_score = 0
 @beginner = ''
@@ -41,7 +40,7 @@ end
 
 def welcome
   prompt "Welcome to Tic Tac Toe!"
-  prompt "First to win five rounds wins the game."
+  prompt "First to win #{GAME_ROUNDS} rounds wins the game."
   sleep 3
 end
 
@@ -291,7 +290,7 @@ def tie_round_prompt
 end
 
 def score_check
-  if @player_score < 5 && @computer_score < 5
+  if @player_score < GAME_ROUNDS && @computer_score < GAME_ROUNDS
     end_round_prompt
   else
     prompt "We have game winner! Calculating final scores now..."
@@ -314,9 +313,9 @@ def end_round_score_update
 end
 
 def winner_check
-  if @player_score == 5
+  if @player_score == GAME_ROUNDS
     player_won_game
-  elsif @computer_score == 5
+  elsif @computer_score == GAME_ROUNDS
     computer_won_game
   end
 end
@@ -335,7 +334,7 @@ end
 
 def play
   keep_score
-  until @player_score == 5 || @computer_score == 5
+  until @player_score == GAME_ROUNDS || @computer_score == GAME_ROUNDS
     beginning_round_prompt
     # show empty board at the beginning of the round
     board = initialize_board
