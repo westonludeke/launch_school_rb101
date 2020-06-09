@@ -98,17 +98,21 @@ def computer_selects_five(brd)
   end
 end
 
+def computer_choice(brd, line)
+  line.each do |comp_choice|
+    if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
+      square = comp_choice
+      brd[square] = COMPUTER_MARKER
+    end
+  end
+end
+
 def computer_win_player_started_round(brd, line)
   if brd.values_at(*line).count(COMPUTER_MARKER) == 2 && \
      brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
      brd.values.count('X') > brd.values.count('O')
-   
-    line.each do |comp_choice|
-      if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
-        square = comp_choice
-        brd[square] = COMPUTER_MARKER
-      end
-    end
+
+    computer_choice(brd, line)
   end
 end
 
@@ -117,12 +121,7 @@ def computer_win_computer_started_round(brd, line)
      brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
      brd.values.count('X') == brd.values.count('O')
     
-    line.each do |comp_choice|
-      if brd.key?(comp_choice) && brd.values_at(comp_choice)[0] == " "
-        square = comp_choice
-        brd[square] = COMPUTER_MARKER
-      end
-    end
+    computer_choice(brd, line)
   end
 end
 
