@@ -90,7 +90,6 @@ def player_places_piece!(brd)
 end
 
 # ---- COMPUTER SELECTIONS ----
-
 def computer_selects_five(brd)
   if brd.values_at(5)[0] == ' '
     square = 5
@@ -134,7 +133,6 @@ def computer_win_computer_started_round(brd, line)
   if brd.values_at(*line).count(COMPUTER_MARKER) == 2 && \
      brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
      brd.values.count('X') == brd.values.count('O')
-    
     computer_choice(brd, line)
   end
 end
@@ -149,26 +147,36 @@ def computer_seals_victory(brd)
   end
 end
 
+def cpu_block_player_started_round(brd, line)
+  if brd.values_at(*line).count(PLAYER_MARKER) == 2 && \
+     brd.values_at(*line).count(COMPUTER_MARKER) == 0 &&
+     brd.values.count('X') > brd.values.count('O')
+    computer_choice(brd, line)
+  end
+end
+
+def cpu_block_cpu_started_round(brd, line)
+  if brd.values_at(*line).count(PLAYER_MARKER) == 2 && \
+     brd.values_at(*line).count(COMPUTER_MARKER) == 0 && \
+     brd.values.count('X') == brd.values.count('O')
+    computer_choice(brd, line)
+  end
+end
+
+def computer_blocks_player(brd)
+  WINNING_LINES.each do |line|
+    if @beginner == 'Player'
+      cpu_block_player_started_round(brd, line)
+    elsif @beginner == 'Computer'
+      cpu_block_cpu_started_round(brd, line)
+    end
+  end
+end
+
 def computer_places_piece!(brd)
   computer_selects_five(brd)
   computer_seals_victory(brd)
-  # If the player is about to win, the computer makes a smart selection, in an attempt to block the player's victory.
-  WINNING_LINES.each do |line|
-    if @beginner == 'Player'
-      if brd.values_at(*line).count(PLAYER_MARKER) == 2 && \
-         brd.values_at(*line).count(COMPUTER_MARKER) == 0 &&
-         brd.values.count('X') > brd.values.count('O')
-        computer_choice(brd, line)
-      end
-    # ------
-    elsif @beginner == 'Computer'
-      if brd.values_at(*line).count(PLAYER_MARKER) == 2 && \
-         brd.values_at(*line).count(COMPUTER_MARKER) == 0 && \
-         brd.values.count('X') == brd.values.count('O')
-        computer_choice(brd, line)
-      end
-    end
-  end
+  computer_blocks_player(brd)
   computer_random_choice(brd)
   display_board(brd)
 end
