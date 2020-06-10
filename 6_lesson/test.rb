@@ -25,8 +25,7 @@ PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 GAME_ROUNDS = 5
 
-@beginner = ''
-score_hash = {"player_score" => 0, "computer_score" => 0, "tie_games" => 0, "rounds_played" => 0}
+score_hash = {"player_score" => 0, "computer_score" => 0, "tie_games" => 0, "rounds_played" => 0, "beginner" => ""}
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -91,7 +90,7 @@ def joinor(arr, punc = ", ", or_and = "or")
 end
 
 def who_starts(score_hash)
-  @beginner = if score_hash["rounds_played"].even?
+  score_hash["beginner"] = if score_hash["rounds_played"].even?
                 'Player'
               else
                 'Computer'
@@ -128,13 +127,13 @@ def computer_choice(brd, line)
   end
 end
 
-def computer_random_choice(brd)
-  if @beginner == 'Player'
+def computer_random_choice(brd, score_hash)
+  if score_hash["beginner"] == 'Player'
     if brd.values.count('X') > brd.values.count('O')
       square = empty_squares(brd).sample
       brd[square] = COMPUTER_MARKER
     end
-  elsif @beginner == 'Computer'
+  elsif score_hash["beginner"] == 'Computer'
     if brd.values.count('X') == brd.values.count('O')
       square = empty_squares(brd).sample
       brd[square] = COMPUTER_MARKER
@@ -159,11 +158,11 @@ def computer_win_computer_started_round(brd, line)
   end
 end
 
-def computer_seals_victory(brd)
+def computer_seals_victory(brd, score_hash)
   WINNING_LINES.each do |line|
-    if @beginner == 'Player'
+    if score_hash["beginner"] == 'Player'
       computer_win_player_started_round(brd, line)
-    elsif @beginner == 'Computer'
+    elsif score_hash["beginner"] == 'Computer'
       computer_win_computer_started_round(brd, line)
     end
   end
@@ -185,21 +184,21 @@ def cpu_block_cpu_started_round(brd, line)
   end
 end
 
-def computer_blocks_player(brd)
+def computer_blocks_player(brd, score_hash)
   WINNING_LINES.each do |line|
-    if @beginner == 'Player'
+    if score_hash["beginner"] == 'Player'
       cpu_block_player_started_round(brd, line)
-    elsif @beginner == 'Computer'
+    elsif score_hash["beginner"] == 'Computer'
       cpu_block_cpu_started_round(brd, line)
     end
   end
 end
 
-def computer_places_piece!(brd)
+def computer_places_piece!(brd, score_hash)
   computer_selects_five(brd)
-  computer_seals_victory(brd)
-  computer_blocks_player(brd)
-  computer_random_choice(brd)
+  computer_seals_victory(brd, score_hash)
+  computer_blocks_player(brd, score_hash)
+  computer_random_choice(brd, score_hash)
   display_board(brd)
 end
 
@@ -225,9 +224,6 @@ end
 # ---- SCORING AND GAMEPLAY ----
 def keep_score
   @scoreboard = []
-  #@player_score = 0
-  #@computer_score = 0
-  #@tie_games = 0
 end
 
 def update_score(score_hash, user, score)
@@ -243,27 +239,27 @@ def beginning_round_prompt(score_hash)
     welcome
   end
   prompt "#{score_hash["rounds_played"]} rounds have been played so far."
-  prompt "The #{@beginner} will start off this round!"
+  prompt "The #{score_hash["beginner"]} will start off this round!"
   sleep 3
 end
 
-def begin_player_loop(board)
+def begin_player_loop(board, score_hash)
   loop do
     display_board(board)
 
     player_places_piece!(board)
     break if someone_won?(board) || board_full?(board)
 
-    computer_places_piece!(board)
+    computer_places_piece!(board, score_hash)
     break if someone_won?(board) || board_full?(board)
   end
 end
 
-def begin_computer_loop(board)
+def begin_computer_loop(board, score_hash)
   loop do
     display_board(board)
 
-    computer_places_piece!(board)
+    computer_places_piece!(board, score_hash)
     break if someone_won?(board) || board_full?(board)
 
     player_places_piece!(board)
@@ -272,11 +268,11 @@ def begin_computer_loop(board)
   end
 end
 
-def selection_loop(board)
-  if @beginner == 'Player'
-    begin_player_loop(board)
-  elsif @beginner == 'Computer'
-    begin_computer_loop(board)
+def selection_loop(board, score_hash)
+  if score_hash["beginner"] == 'Player'
+    begin_player_loop(board, score_hash)
+  elsif score_hash["beginner"] == 'Computer'
+    begin_computer_loop(board, score_hash)
   end
   display_board(board)
 end
@@ -340,7 +336,7 @@ def play(score_hash)
     beginning_round_prompt(score_hash)
     # show empty board at the beginning of the round
     board = initialize_board
-    selection_loop(board)
+    selection_loop(board, score_hash)
 
     if someone_won?(board)
       winner_round_prompt(board)
