@@ -1,37 +1,40 @@
-score_hash = {"player_score" => 0, "computer_score" => 0, "rounds_played" => 0}
+def computer_random_selection(brd)
+  square = empty_squares(brd).sample
+  brd[square] = COMPUTER_MARKER
+end
 
-p score_hash
+def computer_random_choice(brd, keep_score)
+  if keep_score["beginner"] == 'Player' && \
+     brd.values.count('X') > brd.values.count('O')
+    computer_random_selection(brd)
+  elsif keep_score["beginner"] == 'Computer' && \
+        brd.values.count('X') == brd.values.count('O')
+    computer_random_selection(brd)
+  end
+end
+#------------------------
+def computer_two_spaces_filled(brd, line)
+  brd.values_at(*line).count(COMPUTER_MARKER) == 2 && \
+    brd.values_at(*line).count(PLAYER_MARKER) == 0
+end
 
-def winner_round_prompt(score_hash, user, score)
-  #prompt "The #{user} won this round!"
-  #@scoreboard << detect_winner(board)
-  if user == 'Player'
-      p score_hash["player_score"] += 1
-  elsif user == 'Computer'
-    p score_hash["computer_score"] += 1
+def computer_win(brd, line)
+  if computer_two_spaces_filled(brd, line) && \
+     (brd.values.count('X') > brd.values.count('O'))
+    computer_choice(brd, line)
+  elsif computer_two_spaces_filled(brd, line) && \
+        (brd.values.count('X') == brd.values.count('O'))
+    computer_choice(brd, line)
   end
 end
 
-winner_round_prompt(score_hash, 'Player', 1)
-p score_hash
-
-
-# def update_score(score_hash, user, score)
-#   if user == 'player'
-#     p score_hash['player_score'] += 1
-#   elsif user == 'computer'
-#     p score_hash['computer_score'] += 1
-#   end
-# end
-# update_score(score_hash, 'player', 1)
-# #update_score(score_hash, 'computer', 1)
-# p score_hash
-
-# player_score = score_hash["player_score"]
-# p "player score is: #{player_score}"
-# cpu_score = score_hash["computer_score"]
-# p "computer score is #{cpu_score}"
-
-# score_hash["player_score"]
-# score_hash["computer_score"]
-# score_hash["rounds_played"]
+def computer_seals_victory(brd, keep_score)
+  WINNING_LINES.each do |line|
+    if keep_score["beginner"] == 'Player'
+      computer_win(brd, line)
+    elsif keep_score["beginner"] == 'Computer'
+      computer_win(brd, line)
+    end
+  end
+end
+# ----------
