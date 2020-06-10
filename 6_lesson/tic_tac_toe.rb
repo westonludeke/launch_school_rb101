@@ -15,12 +15,6 @@ Rubocop tests.
 
 =end
 
-=begin ---- TO-DO LIST ----
-
-4. Finally, it would be good to clear the screen after each round.
-
-=end
-
 require 'pry'
 
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
@@ -31,8 +25,8 @@ PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 GAME_ROUNDS = 5
 
-@total_score = 0
 @beginner = ''
+score_hash = {"player_score" => 0, "computer_score" => 0, "tie_games" => 0, "rounds_played" => 0}
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -96,14 +90,14 @@ def joinor(arr, punc = ", ", or_and = "or")
   new_arr.join("")
 end
 
-def who_starts
-  @beginner = if @total_score.even?
+def who_starts(score_hash)
+  @beginner = if score_hash["rounds_played"].even?
                 'Player'
               else
                 'Computer'
               end
 end
-who_starts
+who_starts(score_hash)
 
 # ---- PLAYER SELECTIONS ----
 def player_places_piece!(brd)
@@ -231,16 +225,24 @@ end
 # ---- SCORING AND GAMEPLAY ----
 def keep_score
   @scoreboard = []
-  @player_score = 0
-  @computer_score = 0
-  @tie_games = 0
+  #@player_score = 0
+  #@computer_score = 0
+  #@tie_games = 0
 end
 
-def beginning_round_prompt
-  if @total_score == 0
+def update_score(score_hash, user, score)
+  if user == 'player'
+    score_hash['player_score'] += 1
+  elsif user == 'computer'
+    score_hash['computer_score'] += 1
+  end
+end
+
+def beginning_round_prompt(score_hash)
+  if score_hash["rounds_played"] == 0
     welcome
   end
-  prompt "#{@total_score} rounds have been played so far."
+  prompt "#{score_hash["rounds_played"]} rounds have been played so far."
   prompt "The #{@beginner} will start off this round!"
   sleep 3
 end
@@ -284,58 +286,58 @@ def winner_round_prompt(board)
   @scoreboard << detect_winner(board)
 end
 
-def tie_round_prompt
-  @tie_games += 1
+def tie_round_prompt(score_hash)
+  score_hash["tie_games"] += 1
   prompt "It's a tie!"
 end
 
-def score_check
-  if @player_score < GAME_ROUNDS && @computer_score < GAME_ROUNDS
-    end_round_prompt
+def score_check(score_hash)
+  if score_hash["player_score"] < GAME_ROUNDS && score_hash["computer_score"] < GAME_ROUNDS
+    end_round_prompt(score_hash)
   else
     prompt "We have game winner! Calculating final scores now..."
   end
   sleep 5
 end
 
-def end_round_prompt
-  prompt "The Player currently has #{@player_score} wins. " \
-  "The computer has #{@computer_score} wins. " \
-  "There have been #{@tie_games} ties. "
+def end_round_prompt(score_hash)
+  prompt "The Player currently has #{score_hash["player_score"]} wins. " \
+  "The computer has #{score_hash["computer_score"]} wins. " \
+  "There have been #{score_hash["tie_games"]} ties. "
   prompt "The next round will begin soon!"
-  who_starts
+  who_starts(score_hash)
 end
 
-def end_round_score_update
-  @player_score = @scoreboard.count("Player")
-  @computer_score = @scoreboard.count("Computer")
-  @total_score = (@player_score + @computer_score + @tie_games)
+def end_round_score_update(score_hash)
+  score_hash["player_score"] = @scoreboard.count("Player")
+  score_hash["computer_score"] = @scoreboard.count("Computer")
+  score_hash["rounds_played"] = (score_hash["player_score"] + score_hash["computer_score"] + score_hash["tie_games"])
 end
 
-def winner_check
-  if @player_score == GAME_ROUNDS
-    player_won_game
-  elsif @computer_score == GAME_ROUNDS
-    computer_won_game
+def winner_check(score_hash)
+  if score_hash["player_score"] == GAME_ROUNDS
+    player_won_game(score_hash)
+  elsif score_hash["computer_score"] == GAME_ROUNDS
+    computer_won_game(score_hash)
   end
 end
 
-def player_won_game
-  prompt "The player has won the game with #{@player_score} wins" \
-  "against the computer's #{@computer_score} wins and #{@tie_games} ties." \
+def player_won_game(score_hash)
+  prompt "The player has won the game with #{score_hash["player_score"]} wins" \
+  "against the computer's #{score_hash["computer_score"]} wins and #{score_hash["tie_games"]} ties." \
   "Good job!"
 end
 
-def computer_won_game
-  prompt "The computer has won the game with #{@computer_score} victories " \
-  "against your #{@player_score} wins and #{@tie_games} ties. " \
+def computer_won_game(score_hash)
+  prompt "The computer has won the game with #{score_hash["computer_score"]} victories " \
+  "against your #{score_hash["player_score"]} wins and #{score_hash["tie_games"]} ties. " \
   "Better luck next time."
 end
 
-def play
+def play(score_hash)
   keep_score
-  until @player_score == GAME_ROUNDS || @computer_score == GAME_ROUNDS
-    beginning_round_prompt
+  until score_hash["player_score"] == GAME_ROUNDS || score_hash["computer_score"] == GAME_ROUNDS
+    beginning_round_prompt(score_hash)
     # show empty board at the beginning of the round
     board = initialize_board
     selection_loop(board)
@@ -343,23 +345,25 @@ def play
     if someone_won?(board)
       winner_round_prompt(board)
     else
-      tie_round_prompt
+      tie_round_prompt(score_hash)
     end
-    end_round_score_update
-    score_check
+    end_round_score_update(score_hash)
+    score_check(score_hash)
   end
-  winner_check
+  winner_check(score_hash)
 end
 
-play
+play(score_hash)
 
-def play_again
-  @total_score = 0
+def play_again(score_hash)
+  score_hash["rounds_played"] = 0
   prompt "Would you like to play again? (y or n)"
   answer = gets.chomp
   if answer.downcase == ('y') || answer.downcase == ('yes')
-    play
+    score_hash["player_score"] = 0
+    score_hash["computer_score"] = 0
+    play(score_hash)
   end
   prompt "Thanks for playing Tic Tac Toe! Goodbye!"
 end 
-play_again
+play_again(score_hash)
