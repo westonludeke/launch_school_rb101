@@ -7,10 +7,7 @@
 2. The computer always makes the most optimal choice for the computer.
   2a. This means always selecting space #5 if available.
 
-3. I used instance variables for scoring because I didn't know how to /
-properly refactor without them.
-
-4. The code isn't nearly as DRY as it should be, but passes all of the /
+3. The code isn't nearly as DRY as it should be, but passes all of the /
 Rubocop tests.
 
 =end
@@ -25,7 +22,8 @@ PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 GAME_ROUNDS = 5
 
-score_hash = {"player_score" => 0, "computer_score" => 0, "tie_games" => 0, "rounds_played" => 0, "beginner" => ""}
+score_hash = { 'player_score' => 0, 'computer_score' => 0, \
+               'time_games' => 0, "rounds_played" => 0, "beginner" => "" }
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -91,10 +89,10 @@ end
 
 def who_starts(score_hash)
   score_hash["beginner"] = if score_hash["rounds_played"].even?
-                'Player'
-              else
-                'Computer'
-              end
+                             'Player'
+                           else
+                             'Computer'
+                           end
 end
 who_starts(score_hash)
 
@@ -127,17 +125,18 @@ def computer_choice(brd, line)
   end
 end
 
+def computer_random_selection(brd)
+  square = empty_squares(brd).sample
+  brd[square] = COMPUTER_MARKER
+end
+
 def computer_random_choice(brd, score_hash)
-  if score_hash["beginner"] == 'Player'
-    if brd.values.count('X') > brd.values.count('O')
-      square = empty_squares(brd).sample
-      brd[square] = COMPUTER_MARKER
-    end
-  elsif score_hash["beginner"] == 'Computer'
-    if brd.values.count('X') == brd.values.count('O')
-      square = empty_squares(brd).sample
-      brd[square] = COMPUTER_MARKER
-    end
+  if score_hash["beginner"] == 'Player' && \
+     brd.values.count('X') > brd.values.count('O')
+    computer_random_selection(brd)
+  elsif score_hash["beginner"] == 'Computer' && \
+        brd.values.count('X') == brd.values.count('O')
+    computer_random_selection(brd)
   end
 end
 
@@ -222,20 +221,12 @@ def detect_winner(brd)
 end
 
 # ---- SCORING AND GAMEPLAY ----
-def update_score(score_hash, user, score)
-  if user == 'player'
-    score_hash['player_score'] += 1
-  elsif user == 'computer'
-    score_hash['computer_score'] += 1
-  end
-end
-
 def beginning_round_prompt(score_hash)
   if score_hash["rounds_played"] == 0
     welcome
   end
-  prompt "#{score_hash["rounds_played"]} rounds have been played so far."
-  prompt "The #{score_hash["beginner"]} will start off this round!"
+  prompt "#{score_hash['rounds_played']} rounds have been played so far."
+  prompt "The #{score_hash['beginner']} will start off this round!"
   sleep 3
 end
 
@@ -276,19 +267,20 @@ end
 def winner_round_prompt(board, score_hash)
   prompt "The #{detect_winner(board)} won this round!"
   if detect_winner(board) == 'Player'
-    score_hash["player_score"] += 1
+    score_hash['player_score'] += 1
   elsif detect_winner(board) == 'Computer'
-    score_hash["computer_score"] += 1
+    score_hash['computer_score'] += 1
   end
 end
 
 def tie_round_prompt(score_hash)
-  score_hash["tie_games"] += 1
+  score_hash['time_games'] += 1
   prompt "It's a tie!"
 end
 
 def score_check(score_hash)
-  if score_hash["player_score"] < GAME_ROUNDS && score_hash["computer_score"] < GAME_ROUNDS
+  if score_hash['player_score'] < GAME_ROUNDS && \
+     score_hash['computer_score'] < GAME_ROUNDS
     end_round_prompt(score_hash)
   else
     prompt "We have game winner! Calculating final scores now..."
@@ -297,40 +289,44 @@ def score_check(score_hash)
 end
 
 def end_round_prompt(score_hash)
-  prompt "The Player currently has #{score_hash["player_score"]} wins. " \
-  "The computer has #{score_hash["computer_score"]} wins. " \
-  "There have been #{score_hash["tie_games"]} ties. "
+  prompt "The Player currently has #{score_hash['player_score']} wins. " \
+  "The computer has #{score_hash['computer_score']} wins. " \
+  "There have been #{score_hash['time_games']} ties. "
   prompt "The next round will begin soon!"
   who_starts(score_hash)
 end
 
 def end_round_score_update(score_hash)
-  score_hash["rounds_played"] = (score_hash["player_score"] + score_hash["computer_score"] + score_hash["tie_games"])
+  score_hash["rounds_played"] = (score_hash['player_score'] + \
+  score_hash['computer_score'] + score_hash['time_games'])
 end
 
 def winner_check(score_hash)
-  if score_hash["player_score"] == GAME_ROUNDS
+  if score_hash['player_score'] == GAME_ROUNDS
     player_won_game(score_hash)
-  elsif score_hash["computer_score"] == GAME_ROUNDS
+  elsif score_hash['computer_score'] == GAME_ROUNDS
     computer_won_game(score_hash)
   end
 end
 
 def player_won_game(score_hash)
-  prompt "The player has won the game with #{score_hash["player_score"]} wins" \
-  "against the computer's #{score_hash["computer_score"]} wins and #{score_hash["tie_games"]} ties." \
+  prompt "The player has won the game with #{score_hash['player_score']} wins" \
+  "against the computer's #{score_hash['computer_score']} "\
+  "wins and #{score_hash['time_games']} ties." \
   "Good job!"
 end
 
 def computer_won_game(score_hash)
-  prompt "The computer has won the game with #{score_hash["computer_score"]} victories " \
-  "against your #{score_hash["player_score"]} wins and #{score_hash["tie_games"]} ties. " \
+  prompt "The computer has won the game with " \
+  "#{score_hash['computer_score']} victories " \
+  "against your #{score_hash['player_score']} wins " \
+  " and #{score_hash['time_games']} ties. " \
   "Better luck next time."
 end
 
 def play(score_hash)
-  #keep_score
-  until score_hash["player_score"] == GAME_ROUNDS || score_hash["computer_score"] == GAME_ROUNDS
+  until score_hash['player_score'] == GAME_ROUNDS || \
+        score_hash['computer_score'] == GAME_ROUNDS
     beginning_round_prompt(score_hash)
     # show empty board at the beginning of the round
     board = initialize_board
@@ -354,11 +350,11 @@ def play_again(score_hash)
   prompt "Would you like to play again? (y or n)"
   answer = gets.chomp
   if answer.downcase == ('y') || answer.downcase == ('yes')
-    score_hash["player_score"] = 0
-    score_hash["computer_score"] = 0
-    score_hash["tie_games"] = 0
+    score_hash['player_score'] = 0
+    score_hash['computer_score'] = 0
+    score_hash['time_games'] = 0
     play(score_hash)
   end
   prompt "Thanks for playing Tic Tac Toe! Goodbye!"
-end 
+end
 play_again(score_hash)
