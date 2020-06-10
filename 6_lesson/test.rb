@@ -222,10 +222,6 @@ def detect_winner(brd)
 end
 
 # ---- SCORING AND GAMEPLAY ----
-def keep_score
-  @scoreboard = []
-end
-
 def update_score(score_hash, user, score)
   if user == 'player'
     score_hash['player_score'] += 1
@@ -277,9 +273,13 @@ def selection_loop(board, score_hash)
   display_board(board)
 end
 
-def winner_round_prompt(board)
+def winner_round_prompt(board, score_hash)
   prompt "The #{detect_winner(board)} won this round!"
-  @scoreboard << detect_winner(board)
+  if detect_winner(board) == 'Player'
+    score_hash["player_score"] += 1
+  elsif detect_winner(board) == 'Computer'
+    score_hash["computer_score"] += 1
+  end
 end
 
 def tie_round_prompt(score_hash)
@@ -305,8 +305,6 @@ def end_round_prompt(score_hash)
 end
 
 def end_round_score_update(score_hash)
-  score_hash["player_score"] = @scoreboard.count("Player")
-  score_hash["computer_score"] = @scoreboard.count("Computer")
   score_hash["rounds_played"] = (score_hash["player_score"] + score_hash["computer_score"] + score_hash["tie_games"])
 end
 
@@ -331,7 +329,7 @@ def computer_won_game(score_hash)
 end
 
 def play(score_hash)
-  keep_score
+  #keep_score
   until score_hash["player_score"] == GAME_ROUNDS || score_hash["computer_score"] == GAME_ROUNDS
     beginning_round_prompt(score_hash)
     # show empty board at the beginning of the round
@@ -339,7 +337,7 @@ def play(score_hash)
     selection_loop(board, score_hash)
 
     if someone_won?(board)
-      winner_round_prompt(board)
+      winner_round_prompt(board, score_hash)
     else
       tie_round_prompt(score_hash)
     end
@@ -358,6 +356,7 @@ def play_again(score_hash)
   if answer.downcase == ('y') || answer.downcase == ('yes')
     score_hash["player_score"] = 0
     score_hash["computer_score"] = 0
+    score_hash["tie_games"] = 0
     play(score_hash)
   end
   prompt "Thanks for playing Tic Tac Toe! Goodbye!"

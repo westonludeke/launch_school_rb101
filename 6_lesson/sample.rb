@@ -1,33 +1,30 @@
 score_hash = {"player_score" => 0, "computer_score" => 0, "rounds_played" => 0}
-@beginner = ''
 
 p score_hash
 
-def who_starts(score_hash)
-  @beginner = if score_hash.length == 3
-                'Player'
-                p 'Player is beginner'
-                score_hash["player_score"] += 1
-                p score_hash["player_score"]
-              else
-                'Computer'
-                p 'CPU is beginner'
-              end
+def winner_round_prompt(score_hash, user, score)
+  #prompt "The #{user} won this round!"
+  #@scoreboard << detect_winner(board)
+  if user == 'Player'
+      p score_hash["player_score"] += 1
+  elsif user == 'Computer'
+    p score_hash["computer_score"] += 1
+  end
 end
-who_starts(score_hash)
 
+winner_round_prompt(score_hash, 'Player', 1)
 p score_hash
 
 
 # def update_score(score_hash, user, score)
 #   if user == 'player'
 #     p score_hash['player_score'] += 1
-#   elsif user = 'computer'
+#   elsif user == 'computer'
 #     p score_hash['computer_score'] += 1
 #   end
 # end
 # update_score(score_hash, 'player', 1)
-# update_score(score_hash, 'computer', 1)
+# #update_score(score_hash, 'computer', 1)
 # p score_hash
 
 # player_score = score_hash["player_score"]
