@@ -22,8 +22,8 @@ PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 GAME_ROUNDS = 5
 
-score_hash = { 'player_score' => 0, 'computer_score' => 0, \
-               'time_games' => 0, "rounds_played" => 0, "beginner" => "" }
+keep_score = { 'player_score' => 0, 'computer_score' => 0, \
+               'tie_games' => 0, "rounds_played" => 0, "beginner" => "" }
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -87,14 +87,14 @@ def joinor(arr, punc = ", ", or_and = "or")
   new_arr.join("")
 end
 
-def who_starts(score_hash)
-  score_hash["beginner"] = if score_hash["rounds_played"].even?
+def who_starts(keep_score)
+  keep_score["beginner"] = if keep_score["rounds_played"].even?
                              'Player'
                            else
                              'Computer'
                            end
 end
-who_starts(score_hash)
+who_starts(keep_score)
 
 # ---- PLAYER SELECTIONS ----
 def player_places_piece!(brd)
@@ -130,11 +130,11 @@ def computer_random_selection(brd)
   brd[square] = COMPUTER_MARKER
 end
 
-def computer_random_choice(brd, score_hash)
-  if score_hash["beginner"] == 'Player' && \
+def computer_random_choice(brd, keep_score)
+  if keep_score["beginner"] == 'Player' && \
      brd.values.count('X') > brd.values.count('O')
     computer_random_selection(brd)
-  elsif score_hash["beginner"] == 'Computer' && \
+  elsif keep_score["beginner"] == 'Computer' && \
         brd.values.count('X') == brd.values.count('O')
     computer_random_selection(brd)
   end
@@ -157,11 +157,11 @@ def computer_win_computer_started_round(brd, line)
   end
 end
 
-def computer_seals_victory(brd, score_hash)
+def computer_seals_victory(brd, keep_score)
   WINNING_LINES.each do |line|
-    if score_hash["beginner"] == 'Player'
+    if keep_score["beginner"] == 'Player'
       computer_win_player_started_round(brd, line)
-    elsif score_hash["beginner"] == 'Computer'
+    elsif keep_score["beginner"] == 'Computer'
       computer_win_computer_started_round(brd, line)
     end
   end
@@ -183,21 +183,21 @@ def cpu_block_cpu_started_round(brd, line)
   end
 end
 
-def computer_blocks_player(brd, score_hash)
+def computer_blocks_player(brd, keep_score)
   WINNING_LINES.each do |line|
-    if score_hash["beginner"] == 'Player'
+    if keep_score["beginner"] == 'Player'
       cpu_block_player_started_round(brd, line)
-    elsif score_hash["beginner"] == 'Computer'
+    elsif keep_score["beginner"] == 'Computer'
       cpu_block_cpu_started_round(brd, line)
     end
   end
 end
 
-def computer_places_piece!(brd, score_hash)
+def computer_places_piece!(brd, keep_score)
   computer_selects_five(brd)
-  computer_seals_victory(brd, score_hash)
-  computer_blocks_player(brd, score_hash)
-  computer_random_choice(brd, score_hash)
+  computer_seals_victory(brd, keep_score)
+  computer_blocks_player(brd, keep_score)
+  computer_random_choice(brd, keep_score)
   display_board(brd)
 end
 
@@ -221,32 +221,32 @@ def detect_winner(brd)
 end
 
 # ---- SCORING AND GAMEPLAY ----
-def beginning_round_prompt(score_hash)
-  if score_hash["rounds_played"] == 0
+def beginning_round_prompt(keep_score)
+  if keep_score["rounds_played"] == 0
     welcome
   end
-  prompt "#{score_hash['rounds_played']} rounds have been played so far."
-  prompt "The #{score_hash['beginner']} will start off this round!"
+  prompt "#{keep_score['rounds_played']} rounds have been played so far."
+  prompt "The #{keep_score['beginner']} will start off this round!"
   sleep 3
 end
 
-def begin_player_loop(board, score_hash)
+def begin_player_loop(board, keep_score)
   loop do
     display_board(board)
 
     player_places_piece!(board)
     break if someone_won?(board) || board_full?(board)
 
-    computer_places_piece!(board, score_hash)
+    computer_places_piece!(board, keep_score)
     break if someone_won?(board) || board_full?(board)
   end
 end
 
-def begin_computer_loop(board, score_hash)
+def begin_computer_loop(board, keep_score)
   loop do
     display_board(board)
 
-    computer_places_piece!(board, score_hash)
+    computer_places_piece!(board, keep_score)
     break if someone_won?(board) || board_full?(board)
 
     player_places_piece!(board)
@@ -255,106 +255,106 @@ def begin_computer_loop(board, score_hash)
   end
 end
 
-def selection_loop(board, score_hash)
-  if score_hash["beginner"] == 'Player'
-    begin_player_loop(board, score_hash)
-  elsif score_hash["beginner"] == 'Computer'
-    begin_computer_loop(board, score_hash)
+def selection_loop(board, keep_score)
+  if keep_score["beginner"] == 'Player'
+    begin_player_loop(board, keep_score)
+  elsif keep_score["beginner"] == 'Computer'
+    begin_computer_loop(board, keep_score)
   end
   display_board(board)
 end
 
-def winner_round_prompt(board, score_hash)
+def winner_round_prompt(board, keep_score)
   prompt "The #{detect_winner(board)} won this round!"
   if detect_winner(board) == 'Player'
-    score_hash['player_score'] += 1
+    keep_score['player_score'] += 1
   elsif detect_winner(board) == 'Computer'
-    score_hash['computer_score'] += 1
+    keep_score['computer_score'] += 1
   end
 end
 
-def tie_round_prompt(score_hash)
-  score_hash['time_games'] += 1
+def tie_round_prompt(keep_score)
+  keep_score['tie_games'] += 1
   prompt "It's a tie!"
 end
 
-def score_check(score_hash)
-  if score_hash['player_score'] < GAME_ROUNDS && \
-     score_hash['computer_score'] < GAME_ROUNDS
-    end_round_prompt(score_hash)
+def score_check(keep_score)
+  if keep_score['player_score'] < GAME_ROUNDS && \
+     keep_score['computer_score'] < GAME_ROUNDS
+    end_round_prompt(keep_score)
   else
     prompt "We have game winner! Calculating final scores now..."
   end
   sleep 5
 end
 
-def end_round_prompt(score_hash)
-  prompt "The Player currently has #{score_hash['player_score']} wins. " \
-  "The computer has #{score_hash['computer_score']} wins. " \
-  "There have been #{score_hash['time_games']} ties. "
+def end_round_prompt(keep_score)
+  prompt "The Player currently has #{keep_score['player_score']} wins. " \
+  "The computer has #{keep_score['computer_score']} wins. " \
+  "There have been #{keep_score['tie_games']} ties. "
   prompt "The next round will begin soon!"
-  who_starts(score_hash)
+  who_starts(keep_score)
 end
 
-def end_round_score_update(score_hash)
-  score_hash["rounds_played"] = (score_hash['player_score'] + \
-  score_hash['computer_score'] + score_hash['time_games'])
+def end_round_score_update(keep_score)
+  keep_score["rounds_played"] = (keep_score['player_score'] + \
+  keep_score['computer_score'] + keep_score['tie_games'])
 end
 
-def winner_check(score_hash)
-  if score_hash['player_score'] == GAME_ROUNDS
-    player_won_game(score_hash)
-  elsif score_hash['computer_score'] == GAME_ROUNDS
-    computer_won_game(score_hash)
+def winner_check(keep_score)
+  if keep_score['player_score'] == GAME_ROUNDS
+    player_won_game(keep_score)
+  elsif keep_score['computer_score'] == GAME_ROUNDS
+    computer_won_game(keep_score)
   end
 end
 
-def player_won_game(score_hash)
-  prompt "The player has won the game with #{score_hash['player_score']} wins" \
-  "against the computer's #{score_hash['computer_score']} "\
-  "wins and #{score_hash['time_games']} ties." \
+def player_won_game(keep_score)
+  prompt "The player has won the game with #{keep_score['player_score']} wins" \
+  "against the computer's #{keep_score['computer_score']} "\
+  "wins and #{keep_score['tie_games']} ties." \
   "Good job!"
 end
 
-def computer_won_game(score_hash)
+def computer_won_game(keep_score)
   prompt "The computer has won the game with " \
-  "#{score_hash['computer_score']} victories " \
-  "against your #{score_hash['player_score']} wins " \
-  " and #{score_hash['time_games']} ties. " \
+  "#{keep_score['computer_score']} victories " \
+  "against your #{keep_score['player_score']} wins " \
+  " and #{keep_score['tie_games']} ties. " \
   "Better luck next time."
 end
 
-def play(score_hash)
-  until score_hash['player_score'] == GAME_ROUNDS || \
-        score_hash['computer_score'] == GAME_ROUNDS
-    beginning_round_prompt(score_hash)
+def play(keep_score)
+  until keep_score['player_score'] == GAME_ROUNDS || \
+        keep_score['computer_score'] == GAME_ROUNDS
+    beginning_round_prompt(keep_score)
     # show empty board at the beginning of the round
     board = initialize_board
-    selection_loop(board, score_hash)
+    selection_loop(board, keep_score)
 
     if someone_won?(board)
-      winner_round_prompt(board, score_hash)
+      winner_round_prompt(board, keep_score)
     else
-      tie_round_prompt(score_hash)
+      tie_round_prompt(keep_score)
     end
-    end_round_score_update(score_hash)
-    score_check(score_hash)
+    end_round_score_update(keep_score)
+    score_check(keep_score)
   end
-  winner_check(score_hash)
+  winner_check(keep_score)
 end
 
-play(score_hash)
+play(keep_score)
 
-def play_again(score_hash)
-  score_hash["rounds_played"] = 0
+def play_again(keep_score)
+  keep_score["rounds_played"] = 0
   prompt "Would you like to play again? (y or n)"
   answer = gets.chomp
   if answer.downcase == ('y') || answer.downcase == ('yes')
-    score_hash['player_score'] = 0
-    score_hash['computer_score'] = 0
-    score_hash['time_games'] = 0
-    play(score_hash)
+    keep_score['player_score'] = 0
+    keep_score['computer_score'] = 0
+    keep_score['tie_games'] = 0
+    play(keep_score)
   end
   prompt "Thanks for playing Tic Tac Toe! Goodbye!"
 end
-play_again(score_hash)
+play_again(keep_score)
