@@ -17,7 +17,7 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
-GAME_ROUNDS = 5
+WINS_NEEDED_TO_WIN_GAME = 5
 
 keep_score = { 'player_score' => 0, 'computer_score' => 0, \
                'tie_games' => 0, "rounds_played" => 0, "beginner" => "" }
@@ -28,7 +28,7 @@ end
 
 def welcome
   prompt "Welcome to Tic Tac Toe!"
-  prompt "First to win #{GAME_ROUNDS} rounds wins the game."
+  prompt "First to win #{WINS_NEEDED_TO_WIN_GAME} rounds wins the game."
   sleep 3
 end
 
@@ -127,12 +127,21 @@ def computer_random_selection(brd)
   brd[square] = COMPUTER_MARKER
 end
 
+def x_greater_than_o(brd)
+  brd.values.count('X') > brd.values.count('O')
+end
+
+def x_even_with_o(brd)
+  brd.values.count('X') == brd.values.count('O')
+end
+
 def computer_random_choice(brd, keep_score)
   if keep_score["beginner"] == 'Player' && \
-     brd.values.count('X') > brd.values.count('O')
+     x_greater_than_o(brd)
     computer_random_selection(brd)
   elsif keep_score["beginner"] == 'Computer' && \
-        brd.values.count('X') == brd.values.count('O')
+        x_even_with_o(brd)
+    # brd.values.count('X') == brd.values.count('O')
     computer_random_selection(brd)
   end
 end
@@ -145,10 +154,11 @@ end
 
 def computer_win(brd, line)
   if computer_two_spaces_filled(brd, line) && \
-     (brd.values.count('X') > brd.values.count('O'))
+     (x_greater_than_o(brd))
     computer_choice(brd, line)
   elsif computer_two_spaces_filled(brd, line) && \
-        (brd.values.count('X') == brd.values.count('O'))
+        (x_even_with_o(brd))
+    # (brd.values.count('X') == brd.values.count('O'))
     computer_choice(brd, line)
   end
 end
@@ -170,13 +180,13 @@ def player_one_square_away(brd, line)
 end
 
 def rounds_played_even(brd, line)
-  if brd.values.count('X') > brd.values.count('O')
+  if x_greater_than_o(brd)
     computer_choice(brd, line)
   end
 end
 
 def rounds_played_odd(brd, line)
-  if brd.values.count('X') == brd.values.count('O')
+  if x_even_with_o(brd)
     computer_choice(brd, line)
   end
 end
@@ -280,8 +290,8 @@ def display_tie_round_prompt(keep_score)
 end
 
 def score_check(keep_score)
-  if keep_score['player_score'] < GAME_ROUNDS && \
-     keep_score['computer_score'] < GAME_ROUNDS
+  if keep_score['player_score'] < WINS_NEEDED_TO_WIN_GAME && \
+     keep_score['computer_score'] < WINS_NEEDED_TO_WIN_GAME
     display_end_round_prompt(keep_score)
   else
     prompt "We have game winner! Calculating final scores now..."
@@ -303,31 +313,43 @@ def end_round_score_update(keep_score)
 end
 
 def winner_check(keep_score)
-  if keep_score['player_score'] == GAME_ROUNDS
-    display_player_won_game(keep_score)
-  elsif keep_score['computer_score'] == GAME_ROUNDS
-    display_computer_won_game(keep_score)
+  if keep_score['player_score'] == WINS_NEEDED_TO_WIN_GAME
+    prompt "The player has won the game with #{keep_score['player_score']} " \
+    "wins against the computer's #{keep_score['computer_score']} "\
+    "wins and #{keep_score['tie_games']} ties. " \
+    "Good job!"
+    # display_player_won_game(keep_score)
+  elsif keep_score['computer_score'] == WINS_NEEDED_TO_WIN_GAME
+    # display_computer_won_game(keep_score)
+    prompt "The computer has won the game with " \
+    "#{keep_score['computer_score']} victories " \
+    "against your #{keep_score['player_score']} wins " \
+    "and #{keep_score['tie_games']} ties. " \
+    "Better luck next time."
+  else
+    false
   end
 end
 
-def display_player_won_game(keep_score)
-  prompt "The player has won the game with #{keep_score['player_score']} " \
-  "wins against the computer's #{keep_score['computer_score']} "\
-  "wins and #{keep_score['tie_games']} ties. " \
-  "Good job!"
-end
+# def display_player_won_game(keep_score)
+#   prompt "The player has won the game with #{keep_score['player_score']} " \
+#   "wins against the computer's #{keep_score['computer_score']} "\
+#   "wins and #{keep_score['tie_games']} ties. " \
+#   "Good job!"
+# end
 
-def display_computer_won_game(keep_score)
-  prompt "The computer has won the game with " \
-  "#{keep_score['computer_score']} victories " \
-  "against your #{keep_score['player_score']} wins " \
-  " and #{keep_score['tie_games']} ties. " \
-  "Better luck next time."
-end
+# def display_computer_won_game(keep_score)
+#   prompt "The computer has won the game with " \
+#   "#{keep_score['computer_score']} victories " \
+#   "against your #{keep_score['player_score']} wins " \
+#   " and #{keep_score['tie_games']} ties. " \
+#   "Better luck next time."
+# end
 
 def play(keep_score)
-  until keep_score['player_score'] == GAME_ROUNDS || \
-        keep_score['computer_score'] == GAME_ROUNDS
+  until winner_check(keep_score) != false
+    # keep_score['player_score'] == WINS_NEEDED_TO_WIN_GAME || \
+    # keep_score['computer_score'] == WINS_NEEDED_TO_WIN_GAME
     beginning_round_prompt(keep_score)
     # show empty board at the beginning of the round
     board = initialize_board
@@ -341,7 +363,7 @@ def play(keep_score)
     end_round_score_update(keep_score)
     score_check(keep_score)
   end
-  winner_check(keep_score)
+  # winner_check(keep_score)
 end
 
 play(keep_score)
