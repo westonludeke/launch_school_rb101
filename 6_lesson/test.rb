@@ -139,8 +139,8 @@ def computer_random_choice(brd, keep_score)
     computer_random_selection(brd)
   end
 end
-# -----------
 
+# ----- COMPUTER GOES FOR THE WIN ----
 def computer_two_spaces_filled(brd, line)
   brd.values_at(*line).count(COMPUTER_MARKER) == 2 && \
     brd.values_at(*line).count(PLAYER_MARKER) == 0
@@ -166,6 +166,7 @@ def computer_seals_victory(brd, keep_score)
   end
 end
 
+# ---- COMPUTER BLOCKS PLAYER VICTORY
 def player_one_square_away(brd, line)
   brd.values_at(*line).count(PLAYER_MARKER) == 2 && \
     brd.values_at(*line).count(COMPUTER_MARKER) == 0
@@ -194,6 +195,7 @@ def computer_blocks_player(brd, keep_score)
     end
   end
 end
+# ----
 
 def computer_places_piece!(brd, keep_score)
   computer_selects_five(brd)
@@ -275,7 +277,7 @@ def winner_round_prompt(board, keep_score)
   end
 end
 
-def tie_round_prompt(keep_score)
+def display_tie_round_prompt(keep_score)
   keep_score['tie_games'] += 1
   prompt "It's a tie!"
 end
@@ -283,14 +285,14 @@ end
 def score_check(keep_score)
   if keep_score['player_score'] < GAME_ROUNDS && \
      keep_score['computer_score'] < GAME_ROUNDS
-    end_round_prompt(keep_score)
+    display_end_round_prompt(keep_score)
   else
     prompt "We have game winner! Calculating final scores now..."
   end
   sleep 5
 end
 
-def end_round_prompt(keep_score)
+def display_end_round_prompt(keep_score)
   prompt "The Player currently has #{keep_score['player_score']} wins. " \
   "The computer has #{keep_score['computer_score']} wins. " \
   "There have been #{keep_score['tie_games']} ties. "
@@ -305,20 +307,20 @@ end
 
 def winner_check(keep_score)
   if keep_score['player_score'] == GAME_ROUNDS
-    player_won_game(keep_score)
+    display_player_won_game(keep_score)
   elsif keep_score['computer_score'] == GAME_ROUNDS
-    computer_won_game(keep_score)
+    display_computer_won_game(keep_score)
   end
 end
 
-def player_won_game(keep_score)
+def display_player_won_game(keep_score)
   prompt "The player has won the game with #{keep_score['player_score']} " \
   "wins against the computer's #{keep_score['computer_score']} "\
   "wins and #{keep_score['tie_games']} ties. " \
   "Good job!"
 end
 
-def computer_won_game(keep_score)
+def display_computer_won_game(keep_score)
   prompt "The computer has won the game with " \
   "#{keep_score['computer_score']} victories " \
   "against your #{keep_score['player_score']} wins " \
@@ -337,7 +339,7 @@ def play(keep_score)
     if someone_won?(board)
       winner_round_prompt(board, keep_score)
     else
-      tie_round_prompt(keep_score)
+      display_tie_round_prompt(keep_score)
     end
     end_round_score_update(keep_score)
     score_check(keep_score)
