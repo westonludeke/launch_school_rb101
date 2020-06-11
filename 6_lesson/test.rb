@@ -165,58 +165,36 @@ def computer_seals_victory(brd, keep_score)
     end
   end
 end
-# ----------
-# def computer_win_player_started_round(brd, line)
-#   if computer_started_round(brd, line) &&
-#      brd.values.count('X') > brd.values.count('O')
-#     computer_choice(brd, line)
-#   end
-# end
+# --- Block Player ----
+def player_one_square_away(brd, line)
+  brd.values_at(*line).count(PLAYER_MARKER) == 2 && \
+  brd.values_at(*line).count(COMPUTER_MARKER) == 0
+end
 
-# def computer_win_computer_started_round(brd, line)
-#   if brd.values_at(*line).count(COMPUTER_MARKER) == 2 && \
-#      brd.values_at(*line).count(PLAYER_MARKER) == 0 &&
-#      brd.values.count('X') == brd.values.count('O')
-#     computer_choice(brd, line)
-#   end
-# end
-
-# def computer_seals_victory(brd, keep_score)
-#   WINNING_LINES.each do |line|
-#     if keep_score["beginner"] == 'Player'
-#       computer_win_player_started_round(brd, line)
-#     elsif keep_score["beginner"] == 'Computer'
-#       computer_win_computer_started_round(brd, line)
-#     end
-#   end
-# end
-
-def cpu_block_player_started_round(brd, line)
-  if brd.values_at(*line).count(PLAYER_MARKER) == 2 && \
-     brd.values_at(*line).count(COMPUTER_MARKER) == 0 &&
-     brd.values.count('X') > brd.values.count('O')
+def rounds_played_even(brd, line)
+  if brd.values.count('X') > brd.values.count('O')
     computer_choice(brd, line)
   end
 end
 
-def cpu_block_cpu_started_round(brd, line)
-  if brd.values_at(*line).count(PLAYER_MARKER) == 2 && \
-     brd.values_at(*line).count(COMPUTER_MARKER) == 0 && \
-     brd.values.count('X') == brd.values.count('O')
+def rounds_played_odd(brd, line)
+  if brd.values.count('X') == brd.values.count('O')
     computer_choice(brd, line)
   end
 end
 
 def computer_blocks_player(brd, keep_score)
   WINNING_LINES.each do |line|
-    if keep_score["beginner"] == 'Player'
-      cpu_block_player_started_round(brd, line)
-    elsif keep_score["beginner"] == 'Computer'
-      cpu_block_cpu_started_round(brd, line)
+    if player_one_square_away(brd, line)
+      if keep_score["rounds_played"].even?
+        rounds_played_even(brd, line)
+      elsif keep_score["rounds_played"].odd?
+      rounds_played_odd(brd, line)
+      end
     end
   end
 end
-
+#----
 def computer_places_piece!(brd, keep_score)
   computer_selects_five(brd)
   computer_seals_victory(brd, keep_score)
@@ -334,9 +312,9 @@ def winner_check(keep_score)
 end
 
 def player_won_game(keep_score)
-  prompt "The player has won the game with #{keep_score['player_score']} wins" \
+  prompt "The player has won the game with #{keep_score['player_score']} wins " \
   "against the computer's #{keep_score['computer_score']} "\
-  "wins and #{keep_score['tie_games']} ties." \
+  "wins and #{keep_score['tie_games']} ties. " \
   "Good job!"
 end
 

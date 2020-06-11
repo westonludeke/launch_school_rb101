@@ -1,40 +1,41 @@
-def computer_random_selection(brd)
-  square = empty_squares(brd).sample
-  brd[square] = COMPUTER_MARKER
-end
-
-def computer_random_choice(brd, keep_score)
-  if keep_score["beginner"] == 'Player' && \
-     brd.values.count('X') > brd.values.count('O')
-    computer_random_selection(brd)
-  elsif keep_score["beginner"] == 'Computer' && \
-        brd.values.count('X') == brd.values.count('O')
-    computer_random_selection(brd)
+def player_one_square_away(brd, line)
+  if brd.values_at(*line).count(PLAYER_MARKER) == 2 && \
+     brd.values_at(*line).count(COMPUTER_MARKER) == 0
   end
 end
-#------------------------
-def computer_two_spaces_filled(brd, line)
-  brd.values_at(*line).count(COMPUTER_MARKER) == 2 && \
-    brd.values_at(*line).count(PLAYER_MARKER) == 0
-end
 
-def computer_win(brd, line)
-  if computer_two_spaces_filled(brd, line) && \
-     (brd.values.count('X') > brd.values.count('O'))
-    computer_choice(brd, line)
-  elsif computer_two_spaces_filled(brd, line) && \
-        (brd.values.count('X') == brd.values.count('O'))
+def rounds_played_even(brd, line)
+  if brd.values.count('X') > brd.values.count('O')
     computer_choice(brd, line)
   end
 end
 
-def computer_seals_victory(brd, keep_score)
+def rounds_played_odd(brd, line)
+  if brd.values.count('X') == brd.values.count('O')
+    computer_choice(brd, line)
+  end
+end
+
+def computer_blocks_player(brd, keep_score)
   WINNING_LINES.each do |line|
-    if keep_score["beginner"] == 'Player'
-      computer_win(brd, line)
-    elsif keep_score["beginner"] == 'Computer'
-      computer_win(brd, line)
+    player_one_square_away(brd, line)
+    if keep_score["rounds_played"].even?
+      rounds_played_even(brd, line)
+    elsif keep_score["rounds_played"].odd?
+      rounds_played_odd(brd, line)
     end
   end
 end
-# ----------
+
+
+def computer_places_piece!(brd, keep_score)
+  computer_selects_five(brd)
+  computer_seals_victory(brd, keep_score)
+  computer_blocks_player(brd, keep_score)
+  computer_random_choice(brd, keep_score)
+  display_board(brd)
+end
+
+
+
+
