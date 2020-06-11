@@ -141,7 +141,6 @@ def computer_random_choice(brd, keep_score)
     computer_random_selection(brd)
   elsif keep_score["beginner"] == 'Computer' && \
         x_even_with_o(brd)
-    # brd.values.count('X') == brd.values.count('O')
     computer_random_selection(brd)
   end
 end
@@ -158,7 +157,6 @@ def computer_win(brd, line)
     computer_choice(brd, line)
   elsif computer_two_spaces_filled(brd, line) && \
         (x_even_with_o(brd))
-    # (brd.values.count('X') == brd.values.count('O'))
     computer_choice(brd, line)
   end
 end
@@ -318,9 +316,7 @@ def winner_check(keep_score)
     "wins against the computer's #{keep_score['computer_score']} "\
     "wins and #{keep_score['tie_games']} ties. " \
     "Good job!"
-    # display_player_won_game(keep_score)
   elsif keep_score['computer_score'] == WINS_NEEDED_TO_WIN_GAME
-    # display_computer_won_game(keep_score)
     prompt "The computer has won the game with " \
     "#{keep_score['computer_score']} victories " \
     "against your #{keep_score['player_score']} wins " \
@@ -331,27 +327,9 @@ def winner_check(keep_score)
   end
 end
 
-# def display_player_won_game(keep_score)
-#   prompt "The player has won the game with #{keep_score['player_score']} " \
-#   "wins against the computer's #{keep_score['computer_score']} "\
-#   "wins and #{keep_score['tie_games']} ties. " \
-#   "Good job!"
-# end
-
-# def display_computer_won_game(keep_score)
-#   prompt "The computer has won the game with " \
-#   "#{keep_score['computer_score']} victories " \
-#   "against your #{keep_score['player_score']} wins " \
-#   " and #{keep_score['tie_games']} ties. " \
-#   "Better luck next time."
-# end
-
 def play(keep_score)
   until winner_check(keep_score) != false
-    # keep_score['player_score'] == WINS_NEEDED_TO_WIN_GAME || \
-    # keep_score['computer_score'] == WINS_NEEDED_TO_WIN_GAME
     beginning_round_prompt(keep_score)
-    # show empty board at the beginning of the round
     board = initialize_board
     selection_loop(board, keep_score)
 
@@ -363,7 +341,6 @@ def play(keep_score)
     end_round_score_update(keep_score)
     score_check(keep_score)
   end
-  # winner_check(keep_score)
 end
 
 play(keep_score)
