@@ -7,9 +7,6 @@
 2. The computer always makes the most optimal choice for the computer.
   2a. This means always selecting space #5 if available.
 
-3. The code isn't nearly as DRY as it should be, but passes all of the /
-Rubocop tests.
-
 =end
 
 require 'pry'
