@@ -122,7 +122,7 @@ def computer_choice(brd, line)
   end
 end
 
-def computer_random_selection(brd)
+def computer_marks_board(brd)
   square = empty_squares(brd).sample
   brd[square] = COMPUTER_MARKER
 end
@@ -138,10 +138,10 @@ end
 def computer_random_choice(brd, keep_score)
   if keep_score["beginner"] == 'Player' && \
      x_greater_than_o(brd)
-    computer_random_selection(brd)
+    computer_marks_board(brd)
   elsif keep_score["beginner"] == 'Computer' && \
         x_even_with_o(brd)
-    computer_random_selection(brd)
+    computer_marks_board(brd)
   end
 end
 
