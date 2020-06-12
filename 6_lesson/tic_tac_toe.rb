@@ -17,7 +17,7 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
-WINS_NEEDED_TO_WIN_GAME = 5
+WINS_NEEDED_TO_WIN_GAME = 1
 
 keep_score = { 'player_score' => 0, 'computer_score' => 0, \
                'tie_games' => 0, "rounds_played" => 0, "beginner" => "" }
@@ -341,9 +341,8 @@ def play(keep_score)
     end_round_score_update(keep_score)
     score_check(keep_score)
   end
+  play_again(keep_score)
 end
-
-play(keep_score)
 
 def play_again(keep_score)
   keep_score["rounds_played"] = 0
@@ -354,7 +353,9 @@ def play_again(keep_score)
     keep_score['computer_score'] = 0
     keep_score['tie_games'] = 0
     play(keep_score)
+  else
+    prompt "Thanks for playing Tic Tac Toe! Goodbye!"
   end
-  prompt "Thanks for playing Tic Tac Toe! Goodbye!"
 end
-play_again(keep_score)
+
+play(keep_score)
