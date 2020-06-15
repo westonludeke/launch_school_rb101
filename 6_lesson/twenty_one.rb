@@ -108,28 +108,39 @@ def player_hits(keep_score, deck_of_cards, player_hand, dealer_hand)
   alert_cards(keep_score)
   p keep_score
 end
-player_hits(keep_score, deck_of_cards, player_hand, dealer_hand)
 
+def display_winner_or_tie(keep_score)
+  if keep_score["player_hand_points"] == 21 && keep_score["dealer_hand_points"] == 21
+    p "It's a tie game!"
+  elsif keep_score["player_hand_points"] == 21
+    p "You have blackjack! You've won the game, good job!"
+  elsif keep_score["dealer_hand_points"] == 21
+    p "The dealer has blackjack. Sorry player, you lose!"
+  end
+end
 
-# def update_with_newly_drawn_card_values(keep_score)
-#   keep_score['player_current_card_value'] = player_hand[0][1]
-#   keep_score['dealer_current_card_value'] = dealer_hand[0][1]
-# end
+def busted(keep_score)
+  if keep_score["player_hand_points"] > 21 
+    p "Sorry player, you've busted!"
+    return true
+  elsif keep_score["dealer_hand_points"] > 21
+    p "The dealer has busted! You win player!"
+    return true
+  end
+end
 
-# def ask_player_next_move(keep_score, deck_of_cards, player_hand, dealer_hand)
-#   loop do 
-#     puts "Would you like to hit or stay?"
-#     answer = gets.chomp
-#     puts "You have decided to #{answer}"
-#     shuffle_and_deal(deck_of_cards, player_hand, dealer_hand)
-#     p keep_score
-#     get_current_card_value(player_hand, dealer_hand, keep_score)
-#     p keep_score
-#     alert_cards(keep_score)
-#     break if answer == 'stay' || answer == 's' #|| busted?
-#   end
-# end
-# ask_player_next_move(keep_score, deck_of_cards, player_hand, dealer_hand)
+def ask_player_next_move(keep_score, deck_of_cards, player_hand, dealer_hand)
+  loop do 
+    puts "Would you like to hit or stay?"
+    answer = gets.chomp
+    puts "You have decided to #{answer}"
+    display_winner_or_tie(keep_score)
+    busted(keep_score)
+    break if answer == 'stay' || answer == 's' || busted(keep_score) == true
+    player_hits(keep_score, deck_of_cards, player_hand, dealer_hand)
+  end
+end
+ask_player_next_move(keep_score, deck_of_cards, player_hand, dealer_hand)
 
 
 
