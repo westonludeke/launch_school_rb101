@@ -25,20 +25,16 @@ end
 create_deck(card_suits, card_values, deck_of_cards)
 
 def shuffle_and_deal(deck_of_cards, player_hand, dealer_hand)
-  #p "--------------------------"
   deck_of_cards = deck_of_cards.shuffle!
-  #puts "Deck of cards after shuffling..."
-  #p deck_of_cards
   player_hand << deck_of_cards.pop
   dealer_hand << deck_of_cards.pop
-  #p "player hand is #{player_hand}"
-  #p "dealer hand is #{dealer_hand}"
 end
 shuffle_and_deal(deck_of_cards, player_hand, dealer_hand)
 
 def get_current_card_value(player_hand, dealer_hand, keep_score)
   keep_score['player_current_card_value'] = player_hand[0][1]
   keep_score['dealer_current_card_value'] = dealer_hand[0][1]
+  # -- Add these to an array inside the hash
   player_hand.shift
   dealer_hand.shift
 end
@@ -93,13 +89,13 @@ add_integer_points(keep_score)
 p keep_score
 
 def alert_first_dealt_cards(keep_score)
-  p "You drew a: #{keep_score['player_current_card_value']} " \
+  puts "You drew a: #{keep_score['player_current_card_value']} " \
   "and the dealer drew a: #{keep_score['dealer_current_card_value']}." \
 end
 alert_first_dealt_cards(keep_score)
 
 def alert_other_cards(keep_score)
-  p "You now also have a: #{keep_score['player_current_card_value']}"
+  puts "You now also have a: #{keep_score['player_current_card_value']}"
 end
 
 def player_hits(keep_score, deck_of_cards, player_hand, dealer_hand)
@@ -115,23 +111,23 @@ end
 
 def twenty_one_check(keep_score)
   if keep_score["player_hand_points"] == 21 && keep_score["dealer_hand_points"] == 21
-    p "It's a tie game!"
+    puts "It's a tie game!"
     return true
   elsif keep_score["player_hand_points"] == 21
-    p "You have blackjack! You've won the game, good job!"
+    puts "You have blackjack! You've won the game, good job!"
     return true
   elsif keep_score["dealer_hand_points"] == 21
-    p "The dealer has blackjack. Sorry player, you lose!"
+    puts "The dealer has blackjack. Sorry player, you lose!"
     return true
   end
 end
 
 def busted(keep_score)
   if keep_score["player_hand_points"] > 21 
-    p "Sorry player, you've busted!"
+    puts "Sorry player, you've busted!"
     return true
   elsif keep_score["dealer_hand_points"] > 21
-    p "The dealer has busted! You win player!"
+    puts "The dealer has busted! You win player!"
     return true
   else 
     return false
@@ -145,19 +141,14 @@ def ask_player_next_move(keep_score, deck_of_cards, player_hand, dealer_hand)
 end
 
 def game_loop(keep_score, deck_of_cards, player_hand, dealer_hand)
-  loop do
-    if twenty_one_check(keep_score) == true
-      twenty_one_check(keep_score)
-      break
-    elsif busted(keep_score) == true
-      busted(keep_score)
-      break
-    else
-      ask_player_next_move(keep_score, deck_of_cards, player_hand, dealer_hand)
-      break if @answer == 'stay' || @answer == 's'
-      player_hits(keep_score, deck_of_cards, player_hand, dealer_hand)
-    end
+  until busted(keep_score) == true || twenty_one_check(keep_score) == true
+    ask_player_next_move(keep_score, deck_of_cards, player_hand, dealer_hand)
+    player_hits(keep_score, deck_of_cards, player_hand, dealer_hand)
   end
+
+  #     break if @answer == 'stay' || @answer == 's'
+  #    end
+  # end
 end
 game_loop(keep_score, deck_of_cards, player_hand, dealer_hand)
 
