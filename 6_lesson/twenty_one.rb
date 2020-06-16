@@ -1,9 +1,10 @@
 # Twenty-One
 card_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace']
-card_suits = ['hearts', 'diamonds', 'club', 'spade']
+card_suits = ['hearts', 'diamonds', 'clubs', 'spades']
 
 keep_score = { 'player_current_card_value' => '', \
                'dealer_current_card_value' => '', \
+               'player_holds' => [], \
                'player_hand_points' => 0, \
                'dealer_hand_points' => 0, \
                'player_game_score' => 0, \
@@ -24,17 +25,33 @@ def create_deck(card_suits, card_values, deck_of_cards)
 end
 create_deck(card_suits, card_values, deck_of_cards)
 
-def shuffle_and_deal(deck_of_cards, player_hand, dealer_hand)
+def show_the_player_what_cards_theyre_holding(keep_score)
+
+  if keep_score["player_holds"].length == 1
+    keep_score["player_holds"].each do |card|
+      puts "You are holding a #{card[1]} of #{card[0]}."
+    end
+  else
+    keep_score["player_holds"].each do |card|
+      puts "You are holding a #{card[1]} of #{card[0]}"
+    end
+  end  
+end
+
+def shuffle_and_deal(deck_of_cards, player_hand, dealer_hand, keep_score)
   deck_of_cards = deck_of_cards.shuffle!
   player_hand << deck_of_cards.pop
+  keep_score["player_holds"] << player_hand[0]
+  #p "player hand is #{player_hand}"
+  show_the_player_what_cards_theyre_holding(keep_score)
+  #p "You are now holding: #{keep_score["player_holds"]}"
   dealer_hand << deck_of_cards.pop
 end
-shuffle_and_deal(deck_of_cards, player_hand, dealer_hand)
+shuffle_and_deal(deck_of_cards, player_hand, dealer_hand, keep_score)
 
 def get_current_card_value(player_hand, dealer_hand, keep_score)
   keep_score['player_current_card_value'] = player_hand[0][1]
   keep_score['dealer_current_card_value'] = dealer_hand[0][1]
-  # -- Add these to an array inside the hash
   player_hand.shift
   dealer_hand.shift
 end
@@ -94,18 +111,18 @@ def alert_first_dealt_cards(keep_score)
 end
 alert_first_dealt_cards(keep_score)
 
-def alert_other_cards(keep_score)
-  puts "You now also have a: #{keep_score['player_current_card_value']}"
-end
+# def alert_other_cards(keep_score)
+#   puts "You now also have a: #{keep_score['player_current_card_value']}"
+# end
 
 def player_hits(keep_score, deck_of_cards, player_hand, dealer_hand)
   puts "Drawing a new card now..."
-  shuffle_and_deal(deck_of_cards, player_hand, dealer_hand)
+  shuffle_and_deal(deck_of_cards, player_hand, dealer_hand, keep_score)
   get_current_card_value(player_hand, dealer_hand, keep_score)
   convert_ace_to_one_or_eleven(keep_score)
   convert_face_cards_to_ten(keep_score)
   add_integer_points(keep_score)
-  alert_other_cards(keep_score)
+  #alert_other_cards(keep_score)
   p keep_score
 end
 
@@ -143,12 +160,9 @@ end
 def game_loop(keep_score, deck_of_cards, player_hand, dealer_hand)
   until busted(keep_score) == true || twenty_one_check(keep_score) == true
     ask_player_next_move(keep_score, deck_of_cards, player_hand, dealer_hand)
+    break if @answer == 'stay' || @answer == 's'
     player_hits(keep_score, deck_of_cards, player_hand, dealer_hand)
   end
-
-  #     break if @answer == 'stay' || @answer == 's'
-  #    end
-  # end
 end
 game_loop(keep_score, deck_of_cards, player_hand, dealer_hand)
 

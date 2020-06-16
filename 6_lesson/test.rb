@@ -11,20 +11,11 @@ keep_score = { 'player_current_card_value' => 'ace', \
 
 
 
-def score_check(keep_score)
-  if keep_score["player_hand_points"] > keep_score["dealer_hand_points"]
-    p "player wins!"
-    return true
-  else
-    p "no winner"
-    return false
-  end
+def get_current_card_value(player_hand, dealer_hand, keep_score)
+  player_hand["jack", 10]
+  dealer_hand[]
+  # -- Add these to an array inside the hash
+  player_hand.shift
+  dealer_hand.shift
 end
-
-def example(keep_score)
-  if score_check(keep_score) == true
-   score_check(keep_score)
-  end
-end
-
-example(keep_score)
+get_current_card_value(player_hand, dealer_hand, keep_score)
