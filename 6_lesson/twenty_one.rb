@@ -14,6 +14,14 @@ player_hand = []
 dealer_hand = []
 deck_of_cards = []
 
+def welcome
+  puts "Welcome to Twenty-One!"
+  puts "The dealer is shuffling the deck now and will soon hand out the first cards."
+  sleep 3
+  system('clear') || system('cls')
+end
+welcome
+
 def create_deck(card_suits, card_values, deck_of_cards)
   card_suits.each do |val|
     i = 0
@@ -25,35 +33,25 @@ def create_deck(card_suits, card_values, deck_of_cards)
 end
 create_deck(card_suits, card_values, deck_of_cards)
 
-def show_the_player_what_cards_theyre_holding(keep_score)
-
-  if keep_score["player_holds"].length == 1
-    keep_score["player_holds"].each do |card|
-      puts "You are holding a #{card[1]} of #{card[0]}."
-    end
-  else
-    keep_score["player_holds"].each do |card|
-      puts "You are holding a #{card[1]} of #{card[0]}"
-    end
-  end  
-end
-
 def shuffle_and_deal(deck_of_cards, player_hand, dealer_hand, keep_score)
   deck_of_cards = deck_of_cards.shuffle!
   player_hand << deck_of_cards.pop
   keep_score["player_holds"] << player_hand[0]
-  #p "player hand is #{player_hand}"
-  show_the_player_what_cards_theyre_holding(keep_score)
-  #p "You are now holding: #{keep_score["player_holds"]}"
   dealer_hand << deck_of_cards.pop
 end
 shuffle_and_deal(deck_of_cards, player_hand, dealer_hand, keep_score)
+
+def shuffle_and_deal_player_only(deck_of_cards, player_hand, keep_score)
+  deck_of_cards = deck_of_cards.shuffle!
+  player_hand << deck_of_cards.pop
+  keep_score["player_holds"] << player_hand[0]
+end
 
 def get_current_card_value(player_hand, dealer_hand, keep_score)
   keep_score['player_current_card_value'] = player_hand[0][1]
   keep_score['dealer_current_card_value'] = dealer_hand[0][1]
   player_hand.shift
-  dealer_hand.shift
+  #dealer_hand.shift
 end
 get_current_card_value(player_hand, dealer_hand, keep_score)
 
@@ -105,24 +103,33 @@ add_integer_points(keep_score)
 
 p keep_score
 
+def show_the_player_what_cards_theyre_holding(keep_score)
+  if keep_score["player_holds"].length == 1
+    keep_score["player_holds"].each do |card|
+      puts "You are holding a #{card[1]} of #{card[0]}."
+    end
+  else
+    keep_score["player_holds"].each do |card|
+      puts "You are holding a #{card[1]} of #{card[0]}"
+    end
+  end  
+end
+
 def alert_first_dealt_cards(keep_score)
-  puts "You drew a: #{keep_score['player_current_card_value']} " \
-  "and the dealer drew a: #{keep_score['dealer_current_card_value']}." \
+  puts "The dealer has a: #{keep_score['dealer_current_card_value']}."
+  show_the_player_what_cards_theyre_holding(keep_score)
 end
 alert_first_dealt_cards(keep_score)
 
-# def alert_other_cards(keep_score)
-#   puts "You now also have a: #{keep_score['player_current_card_value']}"
-# end
-
 def player_hits(keep_score, deck_of_cards, player_hand, dealer_hand)
   puts "Drawing a new card now..."
-  shuffle_and_deal(deck_of_cards, player_hand, dealer_hand, keep_score)
+  # shuffle_and_deal(deck_of_cards, player_hand, dealer_hand, keep_score)
+  shuffle_and_deal_player_only(deck_of_cards, player_hand, keep_score)
   get_current_card_value(player_hand, dealer_hand, keep_score)
   convert_ace_to_one_or_eleven(keep_score)
   convert_face_cards_to_ten(keep_score)
   add_integer_points(keep_score)
-  #alert_other_cards(keep_score)
+  show_the_player_what_cards_theyre_holding(keep_score)
   p keep_score
 end
 
@@ -157,16 +164,26 @@ def ask_player_next_move(keep_score, deck_of_cards, player_hand, dealer_hand)
   puts "You have decided to #{@answer}"
 end
 
+def stay_and_determine_winner(keep_score)
+  if keep_score["player_hand_points"] > keep_score["dealer_hand_points"]
+    puts "The player wins!"
+  else
+    puts "The dealer wins!"
+  end
+end
+
 def game_loop(keep_score, deck_of_cards, player_hand, dealer_hand)
   until busted(keep_score) == true || twenty_one_check(keep_score) == true
     ask_player_next_move(keep_score, deck_of_cards, player_hand, dealer_hand)
+    if @answer == 'stay' 
+      stay_and_determine_winner(keep_score)
+    end
     break if @answer == 'stay' || @answer == 's'
+    system('clear') || system('cls')
     player_hits(keep_score, deck_of_cards, player_hand, dealer_hand)
   end
 end
 game_loop(keep_score, deck_of_cards, player_hand, dealer_hand)
-
-
 
 
 =begin Implementation Steps:
