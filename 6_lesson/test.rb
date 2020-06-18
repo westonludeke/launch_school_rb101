@@ -126,6 +126,22 @@ convert_dealer_face_cards(keep_score)
 
 p keep_score
 
+def score_check_player_turn(keep_score)
+  if keep_score['player_points'] == 21 && keep_score['dealer_points'] == 21
+    puts "It's a tie game!"
+  elsif keep_score['player_points'] == 21
+    puts "Blackjack! The player wins!"
+  elsif keep_score['dealer_points'] == 21
+    puts "The dealer has Blackjack! Sorry player, you lose."
+  elsif keep_score['player_points'] > 21
+    puts "Sorry player, you've busted!"
+  else
+    puts "You currently have #{keep_score['player_points']} points. "
+    show_dealer_first_card(keep_score)
+  end
+end
+score_check_player_turn(keep_score)
+
 
 =begin Implementation Steps:
 
