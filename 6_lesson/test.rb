@@ -19,12 +19,10 @@
 card_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace']
 card_suits = ['hearts', 'diamonds', 'clubs', 'spades']
 
-keep_score = { 'player_cards_converted' => 0, \
-               'dealer_cards_converted' => 0, \
-               'player_cards' => [], \
+keep_score = { 'player_cards' => [], \
                'dealer_cards' => [], \
-               'player_card_value' => [], \
-               'dealer_card_value' => [], \
+               'player_card_values' => [], \
+               'dealer_card_values' => [], \
                'player_points' => 0, \
                'dealer_points' => 0}
 
@@ -76,51 +74,58 @@ def show_dealer_first_card(keep_score)
 end
 show_dealer_first_card(keep_score)
 
-
-
 def get_current_player_card_value(keep_score)
-  #puts keep_score['player_cards'][keep_score['player_cards_converted']][1]
-  keep_score['player_card_value'] = keep_score['player_cards'][keep_score['player_cards_converted']][1]
-  keep_score['player_cards_converted'] += 1
+  keep_score['player_cards'].each do |card|
+    keep_score['player_card_values'] << card[1] 
+  end
 end
 get_current_player_card_value(keep_score)
 
+def get_current_dealer_card_value(keep_score)
+  keep_score['dealer_cards'].each do |card|
+    keep_score['dealer_card_values'] << card[1] 
+  end
+end
+get_current_dealer_card_value(keep_score)
+
 p keep_score
 
-def convert_ace_to_one_or_eleven(keep_score)
-  if keep_score['player_card_value'] == 'ace'
-    if keep_score['player_points'] + 11 <= 21
-      keep_score['player_points'] += 11
-    else
-      keep_score['player_points'] += 1
+def convert_player_face_cards(keep_score)
+  keep_score['player_card_values'].each do |card|
+    if card == 'ace'
+      if keep_score['player_points'] + 11 <= 21
+        keep_score['player_points'] += 11
+      else
+        keep_score['player_points'] += 1
+      end
+    elsif card == "jack" || card == "queen" || card == "king"
+      keep_score['player_points'] += 10
+    elsif keep_score['player_points'].is_a? Integer
+      keep_score['player_points'] += card
     end
   end
 end
-convert_ace_to_one_or_eleven(keep_score)
+convert_player_face_cards(keep_score)
+
+def convert_dealer_face_cards(keep_score)
+  keep_score['dealer_card_values'].each do |card|
+    if card == 'ace'
+      if keep_score['dealer_points'] + 11 <= 21
+        keep_score['dealer_points'] += 11
+      else
+        keep_score['dealer_points'] += 1
+      end
+    elsif card == "jack" || card == "queen" || card == "king"
+      keep_score['dealer_points'] += 10
+    elsif keep_score['dealer_points'].is_a? Integer
+      keep_score['dealer_points'] += card
+    end
+  end
+end
+convert_dealer_face_cards(keep_score)
 
 p keep_score
-#   if keep_score['player_card'] == 'ace'
-#     if keep_score['player_hand_points'] + 11 <= 21
-#       keep_score['player_hand_points'] += 11
-#     else 
-#       keep_score['player_hand_points'] += 1
-#     end
-#   end
 
-#   if keep_score['dealer_current_card_value'] == 'ace'
-#     if keep_score['dealer_hand_points'] + 11 <= 21
-#       keep_score['dealer_hand_points'] += 11
-#     else 
-#       keep_score['dealer_hand_points'] += 1
-#     end
-#   end  
-# end
-
-# def face_card_check
-# end
-
-# def add_points
-# end
 
 =begin Implementation Steps:
 
