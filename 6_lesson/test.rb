@@ -152,33 +152,38 @@ p keep_score
 def score_check_player_turn(keep_score)
   if keep_score['player_points'] == 21 && keep_score['dealer_points'] == 21
     puts "It's a tie game!"
+    keep_score["player_move"] = 'tie'
   elsif keep_score['player_points'] == 21
     puts "Blackjack! The player wins!"
+    keep_score["player_move"] = 'win'
   elsif keep_score['dealer_points'] == 21
     puts "The dealer has Blackjack! Sorry player, you lose."
+    keep_score["player_move"] = 'lose'
   elsif keep_score['player_points'] > 21
     puts "Sorry player, you've busted!"
+    keep_score["player_move"] = 'bust'
   else
     puts "You currently have #{keep_score['player_points']} points. "
-    #show_dealer_first_card(keep_score)
-    # ask_player_next_move(keep_score, deck_of_cards)
+    keep_score["player_move"] = ''
   end
 end
 score_check_player_turn(keep_score)
 
-# ----- ASK PLAYER NEXT MOVE ----
-def ask_player_next_move(keep_score, deck_of_cards)
-  puts "Would you like to hit or stay?"
-  keep_score["player_move"] = gets.chomp
-  puts "You have decided to #{keep_score["player_move"]}"
-  # if keep_score["player_move"] != 'stay'
-  #   player_hit_loop(keep_score, deck_of_cards)
-  # end
+# ----- ASK PLAYER NEXT MOVE & HIT LOOP ----
+def ask_player_next_move(keep_score)
+  p keep_score
+  if keep_score["player_move"] = ''
+    puts "Would you like to hit or stay?"
+    keep_score["player_move"] = gets.chomp
+    puts "You have decided to #{keep_score["player_move"]}"
+  end
+  p keep_score
 end
-ask_player_next_move(keep_score, deck_of_cards)
+# ask_player_next_move(keep_score)
 
 def player_hit_loop(keep_score, deck_of_cards)
-  if keep_score["player_move"] == 'hit'
+  loop do
+    ask_player_next_move(keep_score)
     puts "Dealing a new card now..."
     sleep 2
     player_dealt_one_card(keep_score, deck_of_cards)
@@ -186,10 +191,14 @@ def player_hit_loop(keep_score, deck_of_cards)
     get_current_player_card_value(keep_score)
     convert_player_face_cards(keep_score)
     score_check_player_turn(keep_score)
+    break if keep_score["player_move"] == 'win' || \
+             keep_score["player_move"] == 'lose' || \
+             keep_score["player_move"] == 'tie' || \
+             keep_score["player_move"] == 'bust' || \
+             keep_score["player_move"] == 'stay'
   end
 end
 player_hit_loop(keep_score, deck_of_cards)
-
 
 p keep_score
 
