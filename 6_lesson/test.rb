@@ -93,6 +93,8 @@ end
 show_dealer_first_card(keep_score)
 
 def get_current_player_card_value(keep_score)
+  keep_score['player_card_values'].clear
+
   keep_score['player_cards'].each do |card|
     keep_score['player_card_values'] << card[1] 
   end
@@ -109,6 +111,8 @@ get_current_dealer_card_value(keep_score)
 p keep_score
 
 def convert_player_face_cards(keep_score)
+  keep_score['player_points'] = 0
+
   keep_score['player_card_values'].each do |card|
     if card == 'ace'
       if keep_score['player_points'] + 11 <= 21
@@ -145,7 +149,7 @@ convert_dealer_face_cards(keep_score)
 p keep_score
 # ---- SCORE CHECK SECTION ----
 
-def score_check_player_turn(keep_score, deck_of_cards)
+def score_check_player_turn(keep_score)
   if keep_score['player_points'] == 21 && keep_score['dealer_points'] == 21
     puts "It's a tie game!"
   elsif keep_score['player_points'] == 21
@@ -160,7 +164,7 @@ def score_check_player_turn(keep_score, deck_of_cards)
     # ask_player_next_move(keep_score, deck_of_cards)
   end
 end
-score_check_player_turn(keep_score, deck_of_cards)
+score_check_player_turn(keep_score)
 
 # ----- ASK PLAYER NEXT MOVE ----
 def ask_player_next_move(keep_score, deck_of_cards)
@@ -173,16 +177,18 @@ def ask_player_next_move(keep_score, deck_of_cards)
 end
 ask_player_next_move(keep_score, deck_of_cards)
 
-# def player_hit_loop(keep_score, deck_of_cards)
-#   puts "Dealing a new card now..."
-#   player_dealt_one_card(keep_score, deck_of_cards)
-#   #sleep 5
-#   show_player_all_cards(keep_score)
-#   get_current_player_card_value(keep_score)
-#   convert_player_face_cards(keep_score)
-#   score_check_player_turn(keep_score, deck_of_cards)
-# end
-# player_hit_loop(keep_score, deck_of_cards)
+def player_hit_loop(keep_score, deck_of_cards)
+  if keep_score["player_move"] == 'hit'
+    puts "Dealing a new card now..."
+    sleep 2
+    player_dealt_one_card(keep_score, deck_of_cards)
+    show_player_all_cards(keep_score)
+    get_current_player_card_value(keep_score)
+    convert_player_face_cards(keep_score)
+    score_check_player_turn(keep_score)
+  end
+end
+player_hit_loop(keep_score, deck_of_cards)
 
 
 p keep_score
