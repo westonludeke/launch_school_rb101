@@ -114,37 +114,53 @@ def convert_player_face_cards(keep_score)
   keep_score['player_points'] = 0
 
   keep_score['player_card_values'].each do |card|
-    if card == 'ace'
-      if keep_score['player_points'] + 11 <= 21
-        keep_score['player_points'] += 11
-      else
-        keep_score['player_points'] += 1
-      end
+    if card.is_a? Integer
+      keep_score['player_points'] += card
     elsif card == "jack" || card == "queen" || card == "king"
       keep_score['player_points'] += 10
-    elsif keep_score['player_points'].is_a? Integer
-      keep_score['player_points'] += card
     end
   end
 end
 convert_player_face_cards(keep_score)
 
 def convert_dealer_face_cards(keep_score)
+  keep_score['dealer_points'] = 0
+
   keep_score['dealer_card_values'].each do |card|
-    if card == 'ace'
-      if keep_score['dealer_points'] + 11 <= 21
-        keep_score['dealer_points'] += 11
-      else
-        keep_score['dealer_points'] += 1
-      end
+    if card.is_a? Integer
+      keep_score['dealer_points'] += card
     elsif card == "jack" || card == "queen" || card == "king"
       keep_score['dealer_points'] += 10
-    elsif keep_score['dealer_points'].is_a? Integer
-      keep_score['dealer_points'] += card
     end
   end
 end
 convert_dealer_face_cards(keep_score)
+
+def convert_player_aces(keep_score)
+  keep_score['player_card_values'].each do |card|
+    if card == 'ace'
+      keep_score['player_points'] += 11
+    end
+  end
+ 
+  keep_score['player_card_values'].select { |value| value == 'ace' }.count.times do
+    keep_score['player_points'] -= 10 if keep_score['player_points'] > 21
+  end
+end
+convert_player_aces(keep_score)
+
+def convert_dealer_aces(keep_score)
+  keep_score['dealer_card_values'].each do |card|
+    if card == 'ace'
+      keep_score['dealer_points'] += 11
+    end
+  end
+ 
+  keep_score['dealer_card_values'].select { |value| value == 'ace' }.count.times do
+    keep_score['dealer_points'] -= 10 if keep_score['dealer_points'] > 21
+  end
+end
+convert_dealer_aces(keep_score)
 
 p keep_score
 # ---- SCORE CHECK SECTION ----
@@ -190,6 +206,7 @@ def player_hit_loop(keep_score, deck_of_cards)
     show_player_all_cards(keep_score)
     get_current_player_card_value(keep_score)
     convert_player_face_cards(keep_score)
+    convert_player_aces(keep_score)
     score_check_player_turn(keep_score)
     break if keep_score["player_move"] == 'win' || \
              keep_score["player_move"] == 'lose' || \
@@ -201,11 +218,6 @@ end
 player_hit_loop(keep_score, deck_of_cards)
 
 p keep_score
-
-
-
-
-
 
 # def game_loop(keep_score, deck_of_cards)
 #   until busted(keep_score) == true || twenty_one_check(keep_score) == true
