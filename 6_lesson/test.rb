@@ -29,7 +29,6 @@ keep_score = { 'player_cards' => [], \
 
 deck_of_cards = []
 
-
 # ---- BEGINNING SETUP LOOP ----
 def welcome
   system('clear') || system('cls')
@@ -63,14 +62,13 @@ def deal_first_two_cards_to_each_user(deck_of_cards, keep_score)
   end
 end
 deal_first_two_cards_to_each_user(deck_of_cards, keep_score)
-# ---- DEAL ONE ADDITIONAL CARD ----
 
+# ---- DEAL ONE ADDITIONAL CARD ----
 def player_dealt_one_card(keep_score, deck_of_cards)
   shuffle!(deck_of_cards)
   keep_score["player_cards"] << deck_of_cards.pop
 end
 p keep_score
-
 #### ADD "DEALER_DEALT_ONE_CARD"
 
 # ---- SHOW CARDS AND CONVERT FACE CARDS ----
@@ -142,7 +140,6 @@ def convert_player_aces(keep_score)
       keep_score['player_points'] += 11
     end
   end
- 
   keep_score['player_card_values'].select { |value| value == 'ace' }.count.times do
     keep_score['player_points'] -= 10 if keep_score['player_points'] > 21
   end
@@ -155,7 +152,6 @@ def convert_dealer_aces(keep_score)
       keep_score['dealer_points'] += 11
     end
   end
- 
   keep_score['dealer_card_values'].select { |value| value == 'ace' }.count.times do
     keep_score['dealer_points'] -= 10 if keep_score['dealer_points'] > 21
   end
@@ -163,8 +159,8 @@ end
 convert_dealer_aces(keep_score)
 
 p keep_score
-# ---- SCORE CHECK SECTION ----
 
+# ---- SCORE CHECK SECTION ----
 def score_check_player_turn(keep_score)
   if keep_score['player_points'] == 21 && keep_score['dealer_points'] == 21
     puts "It's a tie game!"
@@ -195,7 +191,6 @@ def ask_player_next_move(keep_score)
   end
   p keep_score
 end
-# ask_player_next_move(keep_score)
 
 def player_hit_loop(keep_score, deck_of_cards)
   loop do
@@ -218,19 +213,6 @@ end
 player_hit_loop(keep_score, deck_of_cards)
 
 p keep_score
-
-# def game_loop(keep_score, deck_of_cards)
-#   until busted(keep_score) == true || twenty_one_check(keep_score) == true
-#     ask_player_next_move(keep_score, deck_of_cards, player_hand, dealer_hand)
-#     if @answer == 'stay' 
-#       stay_and_determine_winner(keep_score)
-#     end
-#     break if @answer == 'stay' || @answer == 's'
-#     system('clear') || system('cls')
-#     player_hits(keep_score, deck_of_cards, player_hand, dealer_hand)
-#   end
-# end
-# game_loop(keep_score, deck_of_cards)
 
 =begin Implementation Steps:
 
