@@ -24,7 +24,8 @@ keep_score = { 'player_cards' => [], \
                'player_card_values' => [], \
                'dealer_card_values' => [], \
                'player_points' => 0, \
-               'dealer_points' => 0}
+               'dealer_points' => 0, \
+               'player_move' => ''}
 
 deck_of_cards = []
 
@@ -60,6 +61,11 @@ end
 deal_first_two_cards_to_each_user(deck_of_cards, keep_score)
 deal_first_two_cards_to_each_user(deck_of_cards, keep_score)
 
+def player_dealt_one_card(keep_score, deck_of_cards)
+  shuffle!(deck_of_cards)
+  keep_score["player_cards"] << deck_of_cards.pop
+end
+
 p keep_score
 
 def show_player_their_two_cards(keep_score)
@@ -73,6 +79,18 @@ def show_dealer_first_card(keep_score)
 "and #{keep_score["player_cards"].length - 1} unknown cards."
 end
 show_dealer_first_card(keep_score)
+
+def show_player_all_cards(keep_score)
+  #system('clear') || system('cls')
+  i = 1
+  while i < keep_score["player_cards"].length do #keep_score["player_cards"].length
+    keep_score["player_cards"].each do |card|
+      puts "You have a #{card[1]} of #{card[0]}"
+      i += 1
+    end
+  end 
+  #puts "Player you have a #{keep_score["player_cards"][0][1]} of #{keep_score["player_cards"][0][0]} " \
+end
 
 def get_current_player_card_value(keep_score)
   keep_score['player_cards'].each do |card|
@@ -126,7 +144,23 @@ convert_dealer_face_cards(keep_score)
 
 p keep_score
 
-def score_check_player_turn(keep_score)
+def player_hit_loop(keep_score, deck_of_cards)
+  puts "Dealing a new card now..."
+  player_dealt_one_card(keep_score, deck_of_cards)
+  #sleep 5
+  show_player_all_cards(keep_score)
+end
+
+def ask_player_next_move(keep_score, deck_of_cards)
+  puts "Would you like to hit or stay?"
+  keep_score["player_move"] = gets.chomp
+  puts "You have decided to #{keep_score["player_move"]}"
+  if keep_score["player_move"] != 'stay'
+    player_hit_loop(keep_score, deck_of_cards)
+  end
+end
+
+def score_check_player_turn(keep_score, deck_of_cards)
   if keep_score['player_points'] == 21 && keep_score['dealer_points'] == 21
     puts "It's a tie game!"
   elsif keep_score['player_points'] == 21
@@ -138,10 +172,34 @@ def score_check_player_turn(keep_score)
   else
     puts "You currently have #{keep_score['player_points']} points. "
     show_dealer_first_card(keep_score)
+    ask_player_next_move(keep_score, deck_of_cards)
   end
 end
-score_check_player_turn(keep_score)
+score_check_player_turn(keep_score, deck_of_cards)
 
+p keep_score
+# def player_hits(keep_score, deck_of_cards)
+#  player_dealt_one_card(keep_score)
+# end
+
+
+
+
+#   p keep_score
+# end
+
+# def game_loop(keep_score, deck_of_cards)
+#   until busted(keep_score) == true || twenty_one_check(keep_score) == true
+#     ask_player_next_move(keep_score, deck_of_cards, player_hand, dealer_hand)
+#     if @answer == 'stay' 
+#       stay_and_determine_winner(keep_score)
+#     end
+#     break if @answer == 'stay' || @answer == 's'
+#     system('clear') || system('cls')
+#     player_hits(keep_score, deck_of_cards, player_hand, dealer_hand)
+#   end
+# end
+# game_loop(keep_score, deck_of_cards)
 
 =begin Implementation Steps:
 
