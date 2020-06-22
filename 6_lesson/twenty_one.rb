@@ -26,7 +26,8 @@ keep_score = { 'player_cards' => [], \
                'dealer_card_values' => [], \
                'player_points' => 0, \
                'dealer_points' => 0, \
-               'player_move' => '' }
+               'player_move' => '', \
+               'end_game' => false }
 
 deck_of_cards = []
 
@@ -73,24 +74,6 @@ p keep_score
 #### ADD "DEALER_DEALT_ONE_CARD"
 
 # ---- SHOW CARDS AND CONVERT FACE CARDS ----
-def show_player_all_cards(keep_score)
-  # system('clear') || system('cls')
-  i = 1
-  while i < keep_score["player_cards"].length
-    keep_score["player_cards"].each do |card|
-      puts "You have a #{card[1]} of #{card[0]}"
-      i += 1
-    end
-  end
-end
-show_player_all_cards(keep_score)
-
-def show_dealer_first_card(keep_score)
-  puts "The dealer has a #{keep_score['dealer_cards'][0][1]} of "\
-  "#{keep_score['dealer_cards'][0][0]} " \
-  "and #{keep_score['player_cards'].length - 1} unknown cards."
-end
-show_dealer_first_card(keep_score)
 
 def get_current_player_card_value(keep_score)
   keep_score['player_card_values'].clear
@@ -162,63 +145,100 @@ def convert_dealer_aces(keep_score)
 end
 convert_dealer_aces(keep_score)
 
+def show_player_all_cards(keep_score)
+  # system('clear') || system('cls')
+  i = 1
+  while i < keep_score["player_cards"].length
+    keep_score["player_cards"].each do |card|
+      puts "You have a #{card[1]} of #{card[0]}"
+      i += 1
+    end
+  end
+end
+show_player_all_cards(keep_score)
+
+def show_dealer_first_card(keep_score)
+  puts "The dealer has a #{keep_score['dealer_cards'][0][1]} of "\
+  "#{keep_score['dealer_cards'][0][0]} " \
+  "and #{keep_score['player_cards'].length - 1} unknown cards."
+end
+show_dealer_first_card(keep_score)
+
 p keep_score
 
 # ---- SCORE CHECK SECTION ----
-#### Shorten Method
-#### Move alerts to separate display method
 def score_check_player_turn(keep_score)
   if keep_score['player_points'] == 21 && keep_score['dealer_points'] == 21
-    puts "It's a tie game!"
     keep_score["player_move"] = 'tie'
   elsif keep_score['player_points'] == 21
-    puts "Blackjack! The player wins!"
     keep_score["player_move"] = 'win'
   elsif keep_score['dealer_points'] == 21
-    puts "The dealer has Blackjack! Sorry player, you lose."
     keep_score["player_move"] = 'lose'
   elsif keep_score['player_points'] > 21
-    puts "Sorry player, you've busted!"
     keep_score["player_move"] = 'bust'
   else
-    puts "You currently have #{keep_score['player_points']} points. "
     keep_score["player_move"] = ''
   end
 end
 score_check_player_turn(keep_score)
 
-# ----- ASK PLAYER NEXT MOVE & HIT LOOP ----
-def ask_player_next_move(keep_score)
-  p keep_score
+def display_score_update(keep_score)
+  if keep_score["player_move"] == 'tie'
+    puts "It's a tie game!"
+  elsif keep_score["player_move"] == 'win'
+    puts "Blackjack! The player wins!"
+  elsif keep_score["player_move"] == 'lose'
+    puts "The dealer has Blackjack! Sorry player, you lose."
+  elsif keep_score["player_move"] == 'bust'
+    puts "Sorry player, you've busted!"
+  end
+end
+display_score_update(keep_score)
+
+def end_game_check(keep_score)
+  if keep_score["player_move"] != ''
+    keep_score['end_game'] = true
+    puts "Game over!"
+  end
+end
+end_game_check(keep_score)
+
+#### PLAYER POINTS NOT DISPLAYING
+def show_player_points(keep_score)
   if keep_score["player_move"] == ''
+    puts "You currently have #{keep_score['player_points']} points"
+  end
+end
+show_player_points(keep_score)
+
+# ----- ASK PLAYER NEXT MOVE & HIT LOOP ----
+def player_hit_loop(keep_score, deck_of_cards)
+  player_dealt_one_card(keep_score, deck_of_cards)
+  get_current_player_card_value(keep_score)
+  convert_player_face_cards(keep_score)
+  convert_player_aces(keep_score)
+  show_player_all_cards(keep_score)
+  score_check_player_turn(keep_score)
+  show_player_points(keep_score)
+  display_score_update(keep_score)
+  end_game_check(keep_score)
+end
+
+#### CONVERT H TO HIT, S TO STAY. CHECK FOR INVALID ENTRIES.
+def ask_player_next_move(keep_score, deck_of_cards)
+  while keep_score["player_move"] == ''
     puts "Would you like to hit or stay?"
     keep_score["player_move"] = gets.chomp
     puts "You have decided to #{keep_score['player_move']}"
-  end
-  p keep_score
-end
 
-#### Shorten Method
-#### Move puts to Ask Player Next Move
-def player_hit_loop(keep_score, deck_of_cards)
-  loop do
-    ask_player_next_move(keep_score)
-    puts "Dealing a new card now..."
-    sleep 2
-    player_dealt_one_card(keep_score, deck_of_cards)
-    show_player_all_cards(keep_score)
-    get_current_player_card_value(keep_score)
-    convert_player_face_cards(keep_score)
-    convert_player_aces(keep_score)
-    score_check_player_turn(keep_score)
-    break if keep_score["player_move"] == 'win' || \
-             keep_score["player_move"] == 'lose' || \
-             keep_score["player_move"] == 'tie' || \
-             keep_score["player_move"] == 'bust' || \
-             keep_score["player_move"] == 'stay'
+    if keep_score["player_move"] == 'hit'
+      puts "Dealing a new card now..."
+      sleep 2
+      player_hit_loop(keep_score, deck_of_cards)
+    end
   end
 end
-player_hit_loop(keep_score, deck_of_cards)
+ask_player_next_move(keep_score, deck_of_cards)
 
 p keep_score
 
