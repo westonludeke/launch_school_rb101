@@ -1,22 +1,5 @@
 # Twenty-One
 
-=begin ----TO-DO LIST----
-
-1. Both users are initially dealt two cards.
-2. Player sees both of their cards.
-3. Player can only see one of the dealers cards, all others are "unknown".
-4. The value of Ace changes each time a new card is drawn.
-  4b. When a new card is drawn, the value of ace is determined based on \
-   if all cards are >= 21.
-5. Player continues to make choices until:
-  * Reaching 21, busts (i.e. over 21), or the player stays (i.e. under 21).
-6. The dealer only draws more cards once the player stays.
-7. If the dealer stays, compare points to see has the higher total.
-8. The dealer hits until the dealer's points are at least 17.
-9. If the dealer busts, the player wins.
-
-=end
-
 card_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace']
 card_suits = ['hearts', 'diamonds', 'clubs', 'spades']
 
