@@ -71,10 +71,13 @@ def player_dealt_one_card(keep_score, deck_of_cards)
   keep_score["player_cards"] << deck_of_cards.pop
 end
 p keep_score
-#### ADD "DEALER_DEALT_ONE_CARD"
+
+def dealer_dealt_one_card(keep_score, deck_of_cards)
+  shuffle!(deck_of_cards)
+  keep_score["dealer_cards"] << deck_of_cards.pop
+end
 
 # ---- SHOW CARDS AND CONVERT FACE CARDS ----
-
 def get_current_player_card_value(keep_score)
   keep_score['player_card_values'].clear
 
@@ -85,6 +88,8 @@ end
 get_current_player_card_value(keep_score)
 
 def get_current_dealer_card_value(keep_score)
+  keep_score['dealer_card_values'].clear
+
   keep_score['dealer_cards'].each do |card|
     keep_score['dealer_card_values'] << card[1]
   end
@@ -164,6 +169,16 @@ def show_dealer_first_card(keep_score)
 end
 show_dealer_first_card(keep_score)
 
+def show_dealer_all_cards(keep_score)
+  i = 1
+  while i < keep_score["dealer_cards"].length
+    keep_score["dealer_cards"].each do |card|
+      puts "The dealer has a #{card[1]} of #{card[0]}"
+      i += 1
+    end
+  end
+end
+
 p keep_score
 
 # ---- SCORE CHECK SECTION ----
@@ -181,6 +196,20 @@ def score_check_player_turn(keep_score)
   end
 end
 score_check_player_turn(keep_score)
+
+def score_check_dealer_turn(keep_score)
+  if keep_score['player_points'] == keep_score['dealer_points']
+    puts "It's a tie game!"
+  elsif keep_score['dealer_points'] == 21
+    puts "Blackjack! The dealer has won the game!"
+  elsif keep_score['dealer_points'] > 21
+    puts "Busted! You win player! The dealer loses."
+  elsif keep_score['dealer_points'] > 17 && (keep_score['player_points'] < keep_score['dealer_points'])
+    puts "The dealer has won. Better luck next time player."
+  elsif keep_score['dealer_points'] > 17 && (keep_score['player_points'] > keep_score['dealer_points'])
+    puts "You win player!"
+  end
+end
 
 def display_score_update(keep_score)
   if keep_score["player_move"] == 'tie'
@@ -203,13 +232,16 @@ def end_game_check(keep_score)
 end
 end_game_check(keep_score)
 
-#### PLAYER POINTS NOT DISPLAYING
 def show_player_points(keep_score)
   if keep_score["player_move"] == ''
     puts "You currently have #{keep_score['player_points']} points"
   end
 end
 show_player_points(keep_score)
+
+def show_dealer_points(keep_score)
+  puts "The dealer has #{keep_score['dealer_points']} points"
+end
 
 # ----- ASK PLAYER NEXT MOVE & HIT LOOP ----
 def player_hit_loop(keep_score, deck_of_cards)
@@ -239,6 +271,33 @@ def ask_player_next_move(keep_score, deck_of_cards)
   end
 end
 ask_player_next_move(keep_score, deck_of_cards)
+
+p keep_score
+
+def dealer_hit_loop(keep_score, deck_of_cards)
+  dealer_dealt_one_card(keep_score, deck_of_cards)
+  get_current_player_card_value(keep_score)
+  get_current_dealer_card_value(keep_score)
+  convert_player_face_cards(keep_score)
+  convert_dealer_face_cards(keep_score)
+  convert_player_aces(keep_score)
+  convert_dealer_aces(keep_score)
+  show_dealer_all_cards(keep_score)
+  show_dealer_points(keep_score)
+  puts "--------"
+  display_score_update(keep_score)
+end
+
+def dealer_under_seventeen_check(keep_score, deck_of_cards)
+  if keep_score["player_move"] == 'stay'
+    score_check_dealer_turn(keep_score)
+    while keep_score['dealer_points'] < 17
+      dealer_hit_loop(keep_score, deck_of_cards)
+      score_check_dealer_turn(keep_score)
+    end
+  end
+end
+dealer_under_seventeen_check(keep_score, deck_of_cards)
 
 p keep_score
 
