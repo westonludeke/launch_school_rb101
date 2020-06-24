@@ -1,12 +1,5 @@
 # Twenty-One
 
-=begin ---- TO-DO LIST ----
-  
-1. Stop playing once player busts
-
-=end
-
-
 card_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace']
 card_suits = ['hearts', 'diamonds', 'clubs', 'spades']
 
@@ -193,7 +186,7 @@ end
 def busted(keep_score)
   if keep_score['player_points'] > 21
     keep_score['player_move'] = 'bust'
-    puts "Bust! You lose player. Better luck next time!" 
+    #puts "Bust! You lose player. Better luck next time!" 
 
   elsif keep_score['dealer_points'] > 21
     keep_score['dealer_move'] = 'bust'
@@ -208,8 +201,8 @@ def score_check_player_turn(keep_score)
     keep_score["player_move"] = 'win'
   elsif keep_score['dealer_points'] == 21
     keep_score["player_move"] = 'lose'
-  else
-    keep_score["player_move"] = ''
+  # else
+  #   keep_score["player_move"] = ''
   end
 end
 score_check_player_turn(keep_score)
@@ -241,7 +234,9 @@ def display_winner_dealer_loop(keep_score)
   elsif keep_score['dealer_move'] == 'lose'
    puts 'You win player!'
   elsif keep_score['dealer_move'] == 'bust'
-    puts "The dealer busts! You win player!"
+    puts "The dealer busts! " \
+    "The dealer loses due to having #{keep_score['dealer_points']} points " \
+    "compared to your #{keep_score['player_points']}. You win player!"
   end
 end
 
@@ -253,18 +248,25 @@ def display_score_update(keep_score)
   elsif keep_score["player_move"] == 'lose'
     puts "The dealer has Blackjack! Sorry player, you lose."
   elsif keep_score["player_move"] == 'bust'
-    puts "Sorry player, you've busted!"
+    puts "Sorry player, with #{keep_score['player_points']} points, you've busted!"
   end
 end
 display_score_update(keep_score)
 
 def end_game_check(keep_score)
+  puts keep_score
   if keep_score["player_move"] != ''
     keep_score['end_game'] = true
-    puts "Game over!"
+    #puts "Game over!"
   end
 end
 end_game_check(keep_score)
+
+def clear_player_move(keep_score)
+  if keep_score['player_points'] < 21 && keep_score["player_move"] == 'hit'
+    keep_score["player_move"] = ''
+  end
+end
 
 def show_player_points(keep_score)
   if keep_score["player_move"] == ''
@@ -286,6 +288,7 @@ def player_hit_loop(keep_score, deck_of_cards)
   show_player_all_cards(keep_score)
   show_dealer_first_card(keep_score)
   score_check_player_turn(keep_score)
+  clear_player_move(keep_score)
   show_player_points(keep_score)
   display_score_update(keep_score)
   end_game_check(keep_score)
@@ -294,6 +297,8 @@ end
 #### CONVERT H TO HIT, S TO STAY. CHECK FOR INVALID ENTRIES.
 def ask_player_next_move(keep_score, deck_of_cards)
   while keep_score["player_move"] == ''
+    puts "-----"
+    puts keep_score
     puts "Would you like to hit or stay?"
     keep_score["player_move"] = gets.chomp
     puts "You have decided to #{keep_score['player_move']}"
@@ -325,7 +330,6 @@ def dealer_hit_loop(keep_score, deck_of_cards)
   show_dealer_all_cards(keep_score)
   show_dealer_points(keep_score)
   puts "--------"
-  ## Player scores
   display_score_update(keep_score)
 end
 
