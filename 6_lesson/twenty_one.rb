@@ -2,13 +2,8 @@
 
 =begin ---- TODO LIST----
 
-1. After winning, show final score
-2. Tighten up Hit or Stay player input
-3. Dealer shouldn't receive another card until after the player selects to Stay
-4. When dealer's points <= 17, give a message that the dealer stays
-5. Ask StackOverflow how to refactor similar methods
-6. Allow the game to reset and play again
-7. Assignment Branch Condition of "ask_player_next_move" is too high
+1. Assignment Branch Condition of "winner_loop" is too high
+2. Ask StackOverflow how to refactor similar methods
 
 =end
 
@@ -146,39 +141,52 @@ convert_dealer_aces(keep_score)
 # ---- PLAYER LOOP ----
 def show_player_all_cards(keep_score)
   system('clear') || system('cls')
+  puts "Here's your cards player: "
+  puts "------------------------"
+
   i = 1
   while i < keep_score["player_cards"].length
     keep_score["player_cards"].each do |card|
-      puts "You have a #{card[1]} of #{card[0]}"
+      puts "#{card[1]} of #{card[0]}"
       i += 1
     end
   end
+  puts "                        "
 end
 show_player_all_cards(keep_score)
 
 def show_dealer_first_card(keep_score)
-  puts "The dealer has a #{keep_score['dealer_cards'][0][1]} of "\
-  "#{keep_score['dealer_cards'][0][0]} " \
-  "and #{keep_score['player_cards'].length - 1} unknown cards."
+  puts "Here's the dealers cards:"
+  puts "------------------------"
+  puts "#{keep_score['dealer_cards'][0][1]} of "\
+  "#{keep_score['dealer_cards'][0][0]} "
+  puts "1 unknown card."
+  puts "                        "
 end
 show_dealer_first_card(keep_score)
 
 def show_dealer_all_cards(keep_score)
+  puts "                         "
+  puts "Here's the dealer's cards:"
+  puts "-------------------------"
+
   i = 1
   while i < keep_score["dealer_cards"].length
     keep_score["dealer_cards"].each do |card|
-      puts "The dealer has a #{card[1]} of #{card[0]}"
+      puts "#{card[1]} of #{card[0]}"
       i += 1
     end
   end
+  puts "                        "
 end
 
 # ---- SCORE CHECK SECTION ----
 def display_tie_game(keep_score)
-  if keep_score['player_points'] == 21 && keep_score['dealer_points'] == 21
-    keep_score['player_move'] = 'tie'
-    keep_score['dealer_move'] = 'tie'
-    puts "Tie game!"
+  if keep_score['player_move'] == 'stay'
+    if keep_score['player_points'] == keep_score['dealer_points']
+      keep_score['player_move'] = 'tie'
+      keep_score['dealer_move'] = 'tie'
+    end
   end
 end
 
@@ -191,7 +199,6 @@ end
 def busted(keep_score)
   if keep_score['player_points'] > 21
     keep_score['player_move'] = 'bust'
-
   elsif keep_score['dealer_points'] > 21
     keep_score['dealer_move'] = 'bust'
   end
@@ -220,25 +227,29 @@ def dealer_wins(keep_score)
 end
 
 def score_check_dealer_turn(keep_score)
-  # display_tie_game(keep_score)
+  display_tie_game(keep_score)
   display_dealer_blackjack(keep_score)
   busted(keep_score)
   dealer_wins(keep_score)
 end
 
+#### Assignment branch condition too high
+#### Break into 5 different methods
 def display_winner_dealer_loop(keep_score)
   if keep_score['dealer_move'] == 'tie'
-    puts "Tie game!"
+    puts "It's a tie game!"
   elsif keep_score['dealer_move'] == 'blackjack'
-    puts "Blackjack! The dealer has won the game!"
+    puts "Blackjack! The dealer has won the game. " \
+    "Better luck next time player."
   elsif keep_score['dealer_move'] == 'win'
-    puts "The dealer wins! Try again player"
+    puts "The dealer wins! The dealer's #{keep_score['dealer_points']} points" \
+    " beats out your #{keep_score['player_points']} points."
   elsif keep_score['dealer_move'] == 'lose'
-    puts 'You win player!'
+    puts "You win player! Your #{keep_score['player_points']} points " \
+    "beats out the dealer's #{keep_score['dealer_points']} points."
   elsif keep_score['dealer_move'] == 'bust'
-    puts "The dealer busts! " \
-    "The dealer loses due to having #{keep_score['dealer_points']} points " \
-    "compared to your #{keep_score['player_points']}. You win player!"
+    puts "You win! The dealer busts with #{keep_score['dealer_points']} points " \
+    "compared to your #{keep_score['player_points']}."
   end
 end
 
@@ -250,7 +261,7 @@ def display_score_update(keep_score)
   elsif keep_score["player_move"] == 'lose'
     puts "The dealer has Blackjack! Sorry player, you lose."
   elsif keep_score["player_move"] == 'bust'
-    puts "With #{keep_score['player_points']} points you've busted!"
+    puts "Sorry player. At #{keep_score['player_points']} points you've busted!"
   end
 end
 display_score_update(keep_score)
@@ -258,7 +269,6 @@ display_score_update(keep_score)
 def end_game_check(keep_score)
   if keep_score["player_move"] != ''
     keep_score['end_game'] = true
-    # puts "Game over!"
   end
 end
 end_game_check(keep_score)
@@ -272,12 +282,13 @@ end
 def show_player_points(keep_score)
   if keep_score["player_move"] == ''
     puts "You currently have #{keep_score['player_points']} points"
+    puts "                  "
   end
 end
 show_player_points(keep_score)
 
 def show_dealer_points(keep_score)
-  puts "For a total of #{keep_score['dealer_points']} points"
+  puts "The dealer has #{keep_score['dealer_points']} points"
 end
 
 # ----- ASK PLAYER NEXT MOVE & HIT LOOP ----
@@ -295,32 +306,42 @@ def player_hit_loop(keep_score, deck_of_cards)
   end_game_check(keep_score)
 end
 
-#### CONVERT H TO HIT, S TO STAY. CHECK FOR INVALID ENTRIES.
-#### Assignment branch condition too high
+def display_hit_or_stay(keep_score, deck_of_cards)
+  system('clear') || system('cls')
+
+  if keep_score["player_move"] == 'hit'
+    puts "You have decided to #{keep_score['player_move']}"
+    puts "Dealing a new card now..."
+    sleep 2
+    player_hit_loop(keep_score, deck_of_cards)
+  elsif keep_score["player_move"] == 'stay'
+    puts "You have decided to #{keep_score['player_move']}"
+    puts "It's now the dealer's turn. " \
+    "Let's check the dealer's hand so far..."
+    sleep 2
+  end
+end
+
 def ask_player_next_move(keep_score, deck_of_cards)
   while keep_score["player_move"] == ''
     puts "Would you like to hit or stay?"
-    keep_score["player_move"] = gets.chomp
-    puts "You have decided to #{keep_score['player_move']}"
-    sleep 2
-    system('clear') || system('cls')
-
-    if keep_score["player_move"] == 'hit'
-      puts "Dealing a new card now..."
-      sleep 2
-      player_hit_loop(keep_score, deck_of_cards)
-    elsif keep_score["player_move"] == 'stay'
-      puts "Let's check the dealer's hand so far..."
+    answer = gets.chomp
+    if answer.downcase == ('h') || answer.downcase == ('hit')
+      keep_score["player_move"] = 'hit'
+    elsif answer.downcase == ('s') || answer.downcase == ('stay')
+      keep_score["player_move"] = 'stay'
+    else
+      puts "Sorry player, that's an invalid entry!"
       sleep 2
     end
+    display_hit_or_stay(keep_score, deck_of_cards)
   end
 end
 ask_player_next_move(keep_score, deck_of_cards)
 
 def dealer_hit_loop(keep_score, deck_of_cards)
-  ### CLEAR
   puts "The dealer is drawing another card now..."
-  sleep 3
+  sleep 5
   system('clear') || system('cls')
   dealer_dealt_one_card(keep_score, deck_of_cards)
   get_current_player_card_value(keep_score)
@@ -335,7 +356,10 @@ def dealer_hit_loop(keep_score, deck_of_cards)
 end
 
 def dealer_stays(keep_score)
-  # p "dealer stays"
+  puts "The dealer has decided to stay."
+  puts "                  "
+  puts "Let's see if we have a winner. Calculating scores..."
+  puts "                  "
   score_check_dealer_turn(keep_score)
   display_winner_dealer_loop(keep_score)
 end
