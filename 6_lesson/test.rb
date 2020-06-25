@@ -7,6 +7,8 @@
 3. Dealer shouldn't receive another card until after the player selects to Stay
 4. When dealer's points <= 17, give a message that the dealer stays
 5. Ask StackOverflow how to refactor similar methods
+6. Allow the game to reset and play again
+7. Assignment Branch Condition of "ask_player_next_move" is too high
 
 =end
 
@@ -141,7 +143,6 @@ def convert_dealer_aces(keep_score)
 end
 convert_dealer_aces(keep_score)
 
-
 # ---- PLAYER LOOP ----
 def show_player_all_cards(keep_score)
   system('clear') || system('cls')
@@ -208,18 +209,18 @@ def score_check_player_turn(keep_score)
 end
 score_check_player_turn(keep_score)
 
-def dealer_wins(keep_score) 
+def dealer_wins(keep_score)
   if keep_score['dealer_points'] >= 17 && keep_score['dealer_move'] == ''
     if keep_score['player_points'] < keep_score['dealer_points']
       keep_score['dealer_move'] = 'win'
-    else keep_score['player_points'] > keep_score['dealer_points']
+    elsif keep_score['player_points'] > keep_score['dealer_points']
       keep_score['dealer_move'] = 'lose'
     end
   end
 end
 
 def score_check_dealer_turn(keep_score)
-  #display_tie_game(keep_score)
+  # display_tie_game(keep_score)
   display_dealer_blackjack(keep_score)
   busted(keep_score)
   dealer_wins(keep_score)
@@ -233,7 +234,7 @@ def display_winner_dealer_loop(keep_score)
   elsif keep_score['dealer_move'] == 'win'
     puts "The dealer wins! Try again player"
   elsif keep_score['dealer_move'] == 'lose'
-   puts 'You win player!'
+    puts 'You win player!'
   elsif keep_score['dealer_move'] == 'bust'
     puts "The dealer busts! " \
     "The dealer loses due to having #{keep_score['dealer_points']} points " \
@@ -249,7 +250,7 @@ def display_score_update(keep_score)
   elsif keep_score["player_move"] == 'lose'
     puts "The dealer has Blackjack! Sorry player, you lose."
   elsif keep_score["player_move"] == 'bust'
-    puts "Sorry player, with #{keep_score['player_points']} points, you've busted!"
+    puts "With #{keep_score['player_points']} points you've busted!"
   end
 end
 display_score_update(keep_score)
@@ -295,6 +296,7 @@ def player_hit_loop(keep_score, deck_of_cards)
 end
 
 #### CONVERT H TO HIT, S TO STAY. CHECK FOR INVALID ENTRIES.
+#### Assignment branch condition too high
 def ask_player_next_move(keep_score, deck_of_cards)
   while keep_score["player_move"] == ''
     puts "Would you like to hit or stay?"
@@ -318,7 +320,7 @@ ask_player_next_move(keep_score, deck_of_cards)
 def dealer_hit_loop(keep_score, deck_of_cards)
   ### CLEAR
   puts "The dealer is drawing another card now..."
-  sleep 2
+  sleep 3
   system('clear') || system('cls')
   dealer_dealt_one_card(keep_score, deck_of_cards)
   get_current_player_card_value(keep_score)
@@ -333,7 +335,7 @@ def dealer_hit_loop(keep_score, deck_of_cards)
 end
 
 def dealer_stays(keep_score)
-  #p "dealer stays"
+  # p "dealer stays"
   score_check_dealer_turn(keep_score)
   display_winner_dealer_loop(keep_score)
 end
@@ -343,7 +345,7 @@ def dealer_under_seventeen_check(keep_score, deck_of_cards)
     show_dealer_all_cards(keep_score)
     show_dealer_points(keep_score)
     score_check_dealer_turn(keep_score)
-    
+
     while keep_score['dealer_points'] < 17
       dealer_hit_loop(keep_score, deck_of_cards)
     end
@@ -355,7 +357,7 @@ def dealer_under_seventeen_check(keep_score, deck_of_cards)
 end
 dealer_under_seventeen_check(keep_score, deck_of_cards)
 
-#p keep_score
+# p keep_score
 
 =begin Implementation Steps:
 
