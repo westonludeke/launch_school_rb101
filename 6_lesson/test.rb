@@ -1,5 +1,15 @@
 # Twenty-One
 
+=begin ---- TODO LIST----
+
+1. After winning, show final score
+2. Tighten up Hit or Stay player input
+3. Dealer shouldn't receive another card until after the player selects to Stay
+4. When dealer's points <= 17, give a message that the dealer stays
+5. Ask StackOverflow how to refactor similar methods
+
+=end
+
 card_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace']
 card_suits = ['hearts', 'diamonds', 'clubs', 'spades']
 
@@ -20,7 +30,7 @@ def welcome
   system('clear') || system('cls')
   puts "Welcome to Twenty-One!"
   puts "The dealer is shuffling the deck and will soon hand out two cards each."
-  # sleep 3
+  sleep 3
   system('clear') || system('cls')
 end
 welcome
@@ -54,7 +64,6 @@ def player_dealt_one_card(keep_score, deck_of_cards)
   shuffle!(deck_of_cards)
   keep_score["player_cards"] << deck_of_cards.pop
 end
-#p keep_score
 
 def dealer_dealt_one_card(keep_score, deck_of_cards)
   shuffle!(deck_of_cards)
@@ -79,8 +88,6 @@ def get_current_dealer_card_value(keep_score)
   end
 end
 get_current_dealer_card_value(keep_score)
-
-#p keep_score
 
 def convert_player_face_cards(keep_score)
   keep_score['player_points'] = 0
@@ -137,7 +144,7 @@ convert_dealer_aces(keep_score)
 
 # ---- PLAYER LOOP ----
 def show_player_all_cards(keep_score)
-  # system('clear') || system('cls')
+  system('clear') || system('cls')
   i = 1
   while i < keep_score["player_cards"].length
     keep_score["player_cards"].each do |card|
@@ -165,9 +172,6 @@ def show_dealer_all_cards(keep_score)
   end
 end
 
-p keep_score
-
-
 # ---- SCORE CHECK SECTION ----
 def display_tie_game(keep_score)
   if keep_score['player_points'] == 21 && keep_score['dealer_points'] == 21
@@ -186,7 +190,6 @@ end
 def busted(keep_score)
   if keep_score['player_points'] > 21
     keep_score['player_move'] = 'bust'
-    #puts "Bust! You lose player. Better luck next time!" 
 
   elsif keep_score['dealer_points'] > 21
     keep_score['dealer_move'] = 'bust'
@@ -201,8 +204,6 @@ def score_check_player_turn(keep_score)
     keep_score["player_move"] = 'win'
   elsif keep_score['dealer_points'] == 21
     keep_score["player_move"] = 'lose'
-  # else
-  #   keep_score["player_move"] = ''
   end
 end
 score_check_player_turn(keep_score)
@@ -254,10 +255,9 @@ end
 display_score_update(keep_score)
 
 def end_game_check(keep_score)
-  puts keep_score
   if keep_score["player_move"] != ''
     keep_score['end_game'] = true
-    #puts "Game over!"
+    # puts "Game over!"
   end
 end
 end_game_check(keep_score)
@@ -297,11 +297,11 @@ end
 #### CONVERT H TO HIT, S TO STAY. CHECK FOR INVALID ENTRIES.
 def ask_player_next_move(keep_score, deck_of_cards)
   while keep_score["player_move"] == ''
-    puts "-----"
-    puts keep_score
     puts "Would you like to hit or stay?"
     keep_score["player_move"] = gets.chomp
     puts "You have decided to #{keep_score['player_move']}"
+    sleep 2
+    system('clear') || system('cls')
 
     if keep_score["player_move"] == 'hit'
       puts "Dealing a new card now..."
@@ -309,17 +309,17 @@ def ask_player_next_move(keep_score, deck_of_cards)
       player_hit_loop(keep_score, deck_of_cards)
     elsif keep_score["player_move"] == 'stay'
       puts "Let's check the dealer's hand so far..."
+      sleep 2
     end
   end
 end
 ask_player_next_move(keep_score, deck_of_cards)
 
-#p keep_score
-
 def dealer_hit_loop(keep_score, deck_of_cards)
   ### CLEAR
-  puts "-----"
   puts "The dealer is drawing another card now..."
+  sleep 2
+  system('clear') || system('cls')
   dealer_dealt_one_card(keep_score, deck_of_cards)
   get_current_player_card_value(keep_score)
   get_current_dealer_card_value(keep_score)
@@ -329,13 +329,11 @@ def dealer_hit_loop(keep_score, deck_of_cards)
   convert_dealer_aces(keep_score)
   show_dealer_all_cards(keep_score)
   show_dealer_points(keep_score)
-  puts "--------"
   display_score_update(keep_score)
 end
 
 def dealer_stays(keep_score)
   #p "dealer stays"
-  #p keep_score
   score_check_dealer_turn(keep_score)
   display_winner_dealer_loop(keep_score)
 end
@@ -347,7 +345,6 @@ def dealer_under_seventeen_check(keep_score, deck_of_cards)
     score_check_dealer_turn(keep_score)
     
     while keep_score['dealer_points'] < 17
-      # Draw another card
       dealer_hit_loop(keep_score, deck_of_cards)
     end
 
