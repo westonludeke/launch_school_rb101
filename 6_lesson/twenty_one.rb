@@ -305,7 +305,11 @@ end
 show_player_points(keep_score)
 
 def show_dealer_points(keep_score)
+  puts "Scoreboard:"
+  puts "----------"
+  puts "You currently have #{keep_score['player_points']} points"
   puts "The dealer has #{keep_score['dealer_points']} points"
+  puts "        "
 end
 
 # ----- ASK PLAYER NEXT MOVE & HIT LOOP ----
@@ -368,6 +372,7 @@ def dealer_hit_loop(keep_score, deck_of_cards)
   convert_player_aces(keep_score)
   convert_dealer_aces(keep_score)
   show_dealer_all_cards(keep_score)
+  # show_player_points(keep_score)
   show_dealer_points(keep_score)
   display_score_update(keep_score)
 end
@@ -377,6 +382,7 @@ def dealer_stays(keep_score)
   puts "                  "
   puts "Let's see if we have a winner. Calculating scores..."
   puts "                  "
+  sleep 3
   score_check_dealer_turn(keep_score)
   display_winner_dealer_loop(keep_score)
   display_dealer_tie(keep_score)
