@@ -3,6 +3,7 @@
 =begin ---- TODO LIST----
 
 1. Ask StackOverflow how to refactor similar methods
+2. Store 21 and 17 as constants
 
 =end
 
@@ -185,6 +186,7 @@ def tie_game(keep_score)
     if keep_score['player_points'] == keep_score['dealer_points']
       keep_score['player_move'] = 'tie'
       keep_score['dealer_move'] = 'tie'
+      keep_score['end_game'] = true
     end
   end
 end
@@ -192,6 +194,7 @@ end
 def display_dealer_blackjack(keep_score)
   if keep_score['dealer_points'] == 21
     keep_score['dealer_move'] = 'blackjack'
+    keep_score['end_game'] = true
   end
 end
 
@@ -219,8 +222,10 @@ def dealer_wins(keep_score)
   if keep_score['dealer_points'] >= 17 && keep_score['dealer_move'] == ''
     if keep_score['player_points'] < keep_score['dealer_points']
       keep_score['dealer_move'] = 'win'
+      keep_score['end_game'] = true
     elsif keep_score['player_points'] > keep_score['dealer_points']
       keep_score['dealer_move'] = 'lose'
+      keep_score['end_game'] = true
     end
   end
 end
@@ -236,15 +241,18 @@ def display_winner_dealer_loop(keep_score)
   if keep_score['dealer_move'] == 'blackjack'
     puts "Blackjack! The dealer has won the game. " \
     "Better luck next time player."
+    keep_score['end_game'] = true
   elsif keep_score['dealer_move'] == 'win'
     puts "The dealer wins! The dealer's #{keep_score['dealer_points']} points" \
     " beats out your #{keep_score['player_points']} points."
+    keep_score['end_game'] = true
   end
 end
 
 def display_dealer_tie(keep_score)
   if keep_score['dealer_move'] == 'tie'
     puts "It's a tie game!"
+    keep_score['end_game'] = true
   end
 end
 
@@ -252,9 +260,11 @@ def display_dealer_busts_or_loses(keep_score)
   if keep_score['dealer_move'] == 'lose'
     puts "You win player! Your #{keep_score['player_points']} points " \
     "beats out the dealer's #{keep_score['dealer_points']} points."
+    keep_score['end_game'] = true
   elsif keep_score['dealer_move'] == 'bust'
     puts "You win! The dealer busts with #{keep_score['dealer_points']} " \
     "points compared to your #{keep_score['player_points']}."
+    keep_score['end_game'] = true
   end
 end
 
@@ -272,7 +282,7 @@ end
 display_score_update(keep_score)
 
 def end_game_check(keep_score)
-  if keep_score["player_move"] != ''
+  if keep_score['player_move'] != ''
     keep_score['end_game'] = true
   end
 end
@@ -286,6 +296,8 @@ end
 
 def show_player_points(keep_score)
   if keep_score["player_move"] == ''
+    puts "Scoreboard:"
+    puts "----------"
     puts "You currently have #{keep_score['player_points']} points"
     puts "                  "
   end
@@ -329,7 +341,7 @@ end
 
 def ask_player_next_move(keep_score, deck_of_cards)
   while keep_score["player_move"] == ''
-    puts "Would you like to hit or stay?"
+    puts "Would you like to hit or stay? (h or s)"
     answer = gets.chomp
     if answer.downcase == ('h') || answer.downcase == ('hit')
       keep_score["player_move"] = 'hit'
@@ -388,22 +400,53 @@ def dealer_under_seventeen_check(keep_score, deck_of_cards)
 end
 dealer_under_seventeen_check(keep_score, deck_of_cards)
 
-# p keep_score
+def clear_hash(keep_score)
+  keep_score['player_cards'] = []
+  keep_score['dealer_cards'] = []
+  keep_score['player_card_values'] = []
+  keep_score['dealer_card_values'] = []
+  keep_score['player_points'] = 0
+  keep_score['dealer_points'] = 0
+  keep_score['player_move'] = ''
+  keep_score['dealer_move'] = ''
+  keep_score['end_game'] = false
+end
 
-=begin Implementation Steps:
+def play_again_loop(keep_score, deck_of_cards)
+  #### Make this a game loop and refactor
+  shuffle!(deck_of_cards)
+  deal_first_two_cards_to_each_user(deck_of_cards, keep_score)
+  get_current_player_card_value(keep_score)
+  get_current_dealer_card_value(keep_score)
+  convert_player_face_cards(keep_score)
+  convert_dealer_face_cards(keep_score)
+  convert_player_aces(keep_score)
+  convert_dealer_aces(keep_score)
+  show_player_all_cards(keep_score)
+  show_dealer_first_card(keep_score)
+  show_player_points(keep_score)
+  score_check_player_turn(keep_score)
+  display_score_update(keep_score)
+  end_game_check(keep_score)
+  ask_player_next_move(keep_score, deck_of_cards)
+  dealer_under_seventeen_check(keep_score, deck_of_cards)
+end
 
-1. Initialize deck
-2. Deal cards to player and dealer
-3. Player turn: hit or stay
-  - repeat until bust or "stay"
-4. If player bust, dealer wins.
-5. Dealer turn: hit or stay
-  - repeat until total >= 17
-6. If dealer bust, player wins.
-7. Compare cards and declare winner.
-
-You start with a normal 52-card deck consisting of the 4 card_suits \
-(hearts, diamonds, clubs, and spades), \
-and 13 values (2, 3, 4, 5, 6, 7, 8, 9, 10, jack, queen, king, ace).
-
-=end
+def end_game_prompt(keep_score, deck_of_cards)
+  while keep_score['end_game'] == true
+    puts "            "
+    puts "Would you like to play again? (y or n)"
+    answer = gets.chomp
+    if answer.downcase == ('y') || answer.downcase == ('yes')
+      puts "Next round coming up!"
+      sleep 3
+      clear_hash(keep_score)
+      p keep_score
+      play_again_loop(keep_score, deck_of_cards)
+    else
+      keep_score['end_game'] = ''
+      puts "Thanks for playing Twenty One! Goodbye!"
+    end
+  end
+end
+end_game_prompt(keep_score, deck_of_cards)
