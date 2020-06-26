@@ -2,8 +2,7 @@
 
 =begin ---- TODO LIST----
 
-1. Assignment Branch Condition of "winner_loop" is too high
-2. Ask StackOverflow how to refactor similar methods
+1. Ask StackOverflow how to refactor similar methods
 
 =end
 
@@ -181,7 +180,7 @@ def show_dealer_all_cards(keep_score)
 end
 
 # ---- SCORE CHECK SECTION ----
-def display_tie_game(keep_score)
+def tie_game(keep_score)
   if keep_score['player_move'] == 'stay'
     if keep_score['player_points'] == keep_score['dealer_points']
       keep_score['player_move'] = 'tie'
@@ -205,7 +204,7 @@ def busted(keep_score)
 end
 
 def score_check_player_turn(keep_score)
-  display_tie_game(keep_score)
+  tie_game(keep_score)
   busted(keep_score)
 
   if keep_score['player_points'] == 21
@@ -227,29 +226,35 @@ def dealer_wins(keep_score)
 end
 
 def score_check_dealer_turn(keep_score)
-  display_tie_game(keep_score)
+  tie_game(keep_score)
   display_dealer_blackjack(keep_score)
   busted(keep_score)
   dealer_wins(keep_score)
 end
 
-#### Assignment branch condition too high
-#### Break into 5 different methods
 def display_winner_dealer_loop(keep_score)
-  if keep_score['dealer_move'] == 'tie'
-    puts "It's a tie game!"
-  elsif keep_score['dealer_move'] == 'blackjack'
+  if keep_score['dealer_move'] == 'blackjack'
     puts "Blackjack! The dealer has won the game. " \
     "Better luck next time player."
   elsif keep_score['dealer_move'] == 'win'
     puts "The dealer wins! The dealer's #{keep_score['dealer_points']} points" \
     " beats out your #{keep_score['player_points']} points."
-  elsif keep_score['dealer_move'] == 'lose'
+  end
+end
+
+def display_dealer_tie(keep_score)
+  if keep_score['dealer_move'] == 'tie'
+    puts "It's a tie game!"
+  end
+end
+
+def display_dealer_busts_or_loses(keep_score)
+  if keep_score['dealer_move'] == 'lose'
     puts "You win player! Your #{keep_score['player_points']} points " \
     "beats out the dealer's #{keep_score['dealer_points']} points."
   elsif keep_score['dealer_move'] == 'bust'
-    puts "You win! The dealer busts with #{keep_score['dealer_points']} points " \
-    "compared to your #{keep_score['player_points']}."
+    puts "You win! The dealer busts with #{keep_score['dealer_points']} " \
+    "points compared to your #{keep_score['player_points']}."
   end
 end
 
@@ -362,6 +367,8 @@ def dealer_stays(keep_score)
   puts "                  "
   score_check_dealer_turn(keep_score)
   display_winner_dealer_loop(keep_score)
+  display_dealer_tie(keep_score)
+  display_dealer_busts_or_loses(keep_score)
 end
 
 def dealer_under_seventeen_check(keep_score, deck_of_cards)
