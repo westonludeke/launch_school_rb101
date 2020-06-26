@@ -4,6 +4,7 @@
 
 1. Ask StackOverflow how to refactor similar methods
 2. Store 21 and 17 as constants
+3. Only show "The dealer stays" if dealer_points <21
 
 =end
 
@@ -418,9 +419,15 @@ def clear_hash(keep_score)
   keep_score['end_game'] = false
 end
 
-def play_again_loop(keep_score, deck_of_cards)
-  #### Make this a game loop and refactor
+def place_cards_back_in_deck_and_shuffle(keep_score, deck_of_cards, card_suits, card_values)
+  deck_of_cards.clear
+  create_deck(card_suits, card_values, deck_of_cards)
   shuffle!(deck_of_cards)
+end
+
+def play_again_loop(keep_score, deck_of_cards, card_suits, card_values)
+  #### Make this a game loop and refactor
+  place_cards_back_in_deck_and_shuffle(keep_score, deck_of_cards, card_suits, card_values)
   deal_first_two_cards_to_each_user(deck_of_cards, keep_score)
   get_current_player_card_value(keep_score)
   get_current_dealer_card_value(keep_score)
@@ -438,7 +445,7 @@ def play_again_loop(keep_score, deck_of_cards)
   dealer_under_seventeen_check(keep_score, deck_of_cards)
 end
 
-def end_game_prompt(keep_score, deck_of_cards)
+def end_game_prompt(keep_score, deck_of_cards, card_suits, card_values)
   while keep_score['end_game'] == true
     puts "            "
     puts "Would you like to play again? (y or n)"
@@ -448,11 +455,11 @@ def end_game_prompt(keep_score, deck_of_cards)
       sleep 3
       clear_hash(keep_score)
       p keep_score
-      play_again_loop(keep_score, deck_of_cards)
+      play_again_loop(keep_score, deck_of_cards, card_suits, card_values)
     else
       keep_score['end_game'] = ''
       puts "Thanks for playing Twenty One! Goodbye!"
     end
   end
 end
-end_game_prompt(keep_score, deck_of_cards)
+end_game_prompt(keep_score, deck_of_cards, card_suits, card_values)
