@@ -111,6 +111,12 @@ def convert_aces(keep_score)
 
   keep_score['player_points'] += players.length * 11
   keep_score['dealer_points'] += dealers.length * 11
+end
+convert_aces(keep_score)
+
+def reduce_ace_to_one(keep_score)
+  players = keep_score['player_card_values'].select { |card| card == "ace" }
+  dealers = keep_score['dealer_card_values'].select { |card| card == "ace" }
 
   players.length.times do
     keep_score['player_points'] -= 10 if keep_score['player_points'] > 21
@@ -120,7 +126,7 @@ def convert_aces(keep_score)
     keep_score['dealer_points'] -= 10 if keep_score['dealer_points'] > 21
   end
 end
-convert_aces(keep_score)
+reduce_ace_to_one(keep_score)
 
 def show_player_all_cards(keep_score)
   system('clear') || system('cls')
@@ -260,6 +266,7 @@ def player_hit_loop(keep_score, deck_of_cards)
   convert_face_cards(keep_score)
   add_integer_points(keep_score)
   convert_aces(keep_score)
+  reduce_ace_to_one(keep_score)
   show_player_all_cards(keep_score)
   show_dealer_first_card(keep_score)
   score_check_player_turn(keep_score)
@@ -311,6 +318,7 @@ def dealer_hit_loop(keep_score, deck_of_cards)
   convert_face_cards(keep_score)
   add_integer_points(keep_score)
   convert_aces(keep_score)
+  reduce_ace_to_one(keep_score)
   show_dealer_all_cards(keep_score)
   show_dealer_points(keep_score)
   display_score_update(keep_score)
@@ -404,6 +412,7 @@ def play_again_loop(keep_score, deck_of_cards, card_suits, card_values)
   convert_face_cards(keep_score)
   add_integer_points(keep_score)
   convert_aces(keep_score)
+  reduce_ace_to_one(keep_score)
   show_player_all_cards(keep_score)
   show_dealer_first_card(keep_score)
   show_player_points(keep_score)
