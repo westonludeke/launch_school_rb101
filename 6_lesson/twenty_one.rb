@@ -8,6 +8,9 @@
 
 =end
 
+BLACKJACK = 21
+DEALER_HITS_UNTIL = 17
+
 card_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace']
 card_suits = ['hearts', 'diamonds', 'clubs', 'spades']
 
@@ -111,16 +114,22 @@ def convert_aces(keep_score)
 
   keep_score['player_points'] += players.length * 11
   keep_score['dealer_points'] += dealers.length * 11
+end
+convert_aces(keep_score)
+
+def reduce_ace_to_one(keep_score)
+  players = keep_score['player_card_values'].select { |card| card == "ace" }
+  dealers = keep_score['dealer_card_values'].select { |card| card == "ace" }
 
   players.length.times do
-    keep_score['player_points'] -= 10 if keep_score['player_points'] > 21
+    keep_score['player_points'] -= 10 if keep_score['player_points'] > BLACKJACK
   end
 
   dealers.length.times do
-    keep_score['dealer_points'] -= 10 if keep_score['dealer_points'] > 21
+    keep_score['dealer_points'] -= 10 if keep_score['dealer_points'] > BLACKJACK
   end
 end
-convert_aces(keep_score)
+reduce_ace_to_one(keep_score)
 
 def show_player_all_cards(keep_score)
   system('clear') || system('cls')
@@ -172,16 +181,16 @@ def tie_game(keep_score)
 end
 
 def dealer_blackjack(keep_score)
-  if keep_score['dealer_points'] == 21
+  if keep_score['dealer_points'] == BLACKJACK
     keep_score['dealer_move'] = 'blackjack'
     keep_score['end_game'] = true
   end
 end
 
 def busted(keep_score)
-  if keep_score['player_points'] > 21
+  if keep_score['player_points'] > BLACKJACK
     keep_score['player_move'] = 'bust'
-  elsif keep_score['dealer_points'] > 21
+  elsif keep_score['dealer_points'] > BLACKJACK
     keep_score['dealer_move'] = 'bust'
   end
 end
@@ -190,9 +199,9 @@ def score_check_player_turn(keep_score)
   tie_game(keep_score)
   busted(keep_score)
 
-  if keep_score['player_points'] == 21
+  if keep_score['player_points'] == BLACKJACK
     keep_score["player_move"] = 'win'
-  elsif keep_score['dealer_points'] == 21
+  elsif keep_score['dealer_points'] == BLACKJACK
     keep_score["player_move"] = 'lose'
   end
 end
@@ -212,7 +221,7 @@ end
 display_score_update(keep_score)
 
 def dealer_win_or_lose(keep_score)
-  if keep_score['dealer_points'] >= 17 && keep_score['dealer_move'] == 'stay'
+  if keep_score['dealer_points'] >= DEALER_HITS_UNTIL && keep_score['dealer_move'] == 'stay'
     if keep_score['player_points'] < keep_score['dealer_points']
       keep_score['dealer_move'] = 'win'
       keep_score['end_game'] = true
@@ -231,7 +240,7 @@ end
 end_game_check(keep_score)
 
 def clear_player_move(keep_score)
-  if keep_score['player_points'] < 21 && keep_score["player_move"] == 'hit'
+  if keep_score['player_points'] < BLACKJACK && keep_score["player_move"] == 'hit'
     keep_score["player_move"] = ''
   end
 end
@@ -260,6 +269,7 @@ def player_hit_loop(keep_score, deck_of_cards)
   convert_face_cards(keep_score)
   add_integer_points(keep_score)
   convert_aces(keep_score)
+  reduce_ace_to_one(keep_score)
   show_player_all_cards(keep_score)
   show_dealer_first_card(keep_score)
   score_check_player_turn(keep_score)
@@ -311,6 +321,7 @@ def dealer_hit_loop(keep_score, deck_of_cards)
   convert_face_cards(keep_score)
   add_integer_points(keep_score)
   convert_aces(keep_score)
+  reduce_ace_to_one(keep_score)
   show_dealer_all_cards(keep_score)
   show_dealer_points(keep_score)
   display_score_update(keep_score)
@@ -365,11 +376,11 @@ def dealer_under_seventeen_check(keep_score, deck_of_cards)
     show_dealer_all_cards(keep_score)
     show_dealer_points(keep_score)
 
-    while keep_score['dealer_points'] < 17
+    while keep_score['dealer_points'] < DEALER_HITS_UNTIL
       dealer_hit_loop(keep_score, deck_of_cards)
     end
 
-    if keep_score['dealer_points'] >= 17
+    if keep_score['dealer_points'] >= DEALER_HITS_UNTIL
       calculate_winner(keep_score)
       display_winner_dealer_loop(keep_score)
       display_dealer_blackjack(keep_score)
@@ -404,6 +415,7 @@ def play_again_loop(keep_score, deck_of_cards, card_suits, card_values)
   convert_face_cards(keep_score)
   add_integer_points(keep_score)
   convert_aces(keep_score)
+  reduce_ace_to_one(keep_score)
   show_player_all_cards(keep_score)
   show_dealer_first_card(keep_score)
   show_player_points(keep_score)
