@@ -87,31 +87,33 @@ def get_current_card_value(keep_score)
 end
 get_current_card_value(keep_score)
 
-def convert_player_face_cards(keep_score)
+def convert_face_cards(keep_score)
   keep_score['player_points'] = 0
+  keep_score['dealer_points'] = 0
 
+  players = keep_score['player_card_values'].select \
+            { |card| card == "jack" || card == "queen" || card == "king" }
+  dealers = keep_score['dealer_card_values'].select \
+            { |card| card == "jack" || card == "queen" || card == "king" }
+
+  keep_score['player_points'] = players.length * 10
+  keep_score['dealer_points'] = dealers.length * 10
+end
+convert_face_cards(keep_score)
+
+def add_integer_points(keep_score)
   keep_score['player_card_values'].each do |card|
     if card.is_a? Integer
       keep_score['player_points'] += card
-    elsif card == "jack" || card == "queen" || card == "king"
-      keep_score['player_points'] += 10
     end
   end
-end
-convert_player_face_cards(keep_score)
-
-def convert_dealer_face_cards(keep_score)
-  keep_score['dealer_points'] = 0
-
   keep_score['dealer_card_values'].each do |card|
     if card.is_a? Integer
       keep_score['dealer_points'] += card
-    elsif card == "jack" || card == "queen" || card == "king"
-      keep_score['dealer_points'] += 10
     end
   end
 end
-convert_dealer_face_cards(keep_score)
+add_integer_points(keep_score)
 
 def convert_player_aces(keep_score)
   keep_score['player_card_values'].each do |card|
@@ -277,7 +279,8 @@ end
 def player_hit_loop(keep_score, deck_of_cards)
   player_dealt_one_card(keep_score, deck_of_cards)
   get_current_card_value(keep_score)
-  convert_player_face_cards(keep_score)
+  convert_face_cards(keep_score)
+  add_integer_points(keep_score)
   convert_player_aces(keep_score)
   show_player_all_cards(keep_score)
   show_dealer_first_card(keep_score)
@@ -327,8 +330,8 @@ def dealer_hit_loop(keep_score, deck_of_cards)
   system('clear') || system('cls')
   dealer_dealt_one_card(keep_score, deck_of_cards)
   get_current_card_value(keep_score)
-  convert_player_face_cards(keep_score)
-  convert_dealer_face_cards(keep_score)
+  convert_face_cards(keep_score)
+  add_integer_points(keep_score)
   convert_player_aces(keep_score)
   convert_dealer_aces(keep_score)
   show_dealer_all_cards(keep_score)
@@ -424,8 +427,8 @@ def play_again_loop(keep_score, deck_of_cards, card_suits, card_values)
   place_cards_back_in_deck_and_shuffle(deck_of_cards, card_suits, card_values)
   deal_first_two_cards_to_each_user(deck_of_cards, keep_score)
   get_current_card_value(keep_score)
-  convert_player_face_cards(keep_score)
-  convert_dealer_face_cards(keep_score)
+  convert_face_cards(keep_score)
+  add_integer_points(keep_score)
   convert_player_aces(keep_score)
   convert_dealer_aces(keep_score)
   show_player_all_cards(keep_score)
