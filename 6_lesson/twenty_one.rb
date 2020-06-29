@@ -2,13 +2,9 @@
 
 =begin ---- TODO LIST----
 
-1. Ask StackOverflow how to refactor similar methods
-  a. 'convert face cards' and 'convert aces' to be more DRY
-  without flagging Rubocop for more than 15 lines.
+1. Store 21 and 17 as constants
 
-2. Store 21 and 17 as constants
-
-3. Keep scores, first to 5 rounds wins the game
+2. Keep scores, first to 5 rounds wins the game
 
 =end
 
@@ -27,7 +23,6 @@ keep_score = { 'player_cards' => [], \
 
 deck_of_cards = []
 
-# ---- BEGINNING SETUP LOOP ----
 def welcome
   system('clear') || system('cls')
   puts "Welcome to Twenty-One!"
@@ -61,7 +56,6 @@ def deal_first_two_cards_to_each_user(deck_of_cards, keep_score)
 end
 deal_first_two_cards_to_each_user(deck_of_cards, keep_score)
 
-# ---- FROM USER LOOPS / DEAL ONE ADDITIONAL CARD ----
 def player_dealt_one_card(keep_score, deck_of_cards)
   shuffle!(deck_of_cards)
   keep_score["player_cards"] << deck_of_cards.pop
@@ -72,7 +66,6 @@ def dealer_dealt_one_card(keep_score, deck_of_cards)
   keep_score["dealer_cards"] << deck_of_cards.pop
 end
 
-# ---- SHOW CARDS AND CONVERT FACE CARDS ----
 def get_current_card_value(keep_score)
   keep_score['player_card_values'].clear
   keep_score['dealer_card_values'].clear
@@ -102,46 +95,33 @@ end
 convert_face_cards(keep_score)
 
 def add_integer_points(keep_score)
-  keep_score['player_card_values'].each do |card|
-    if card.is_a? Integer
-      keep_score['player_points'] += card
-    end
-  end
-  keep_score['dealer_card_values'].each do |card|
-    if card.is_a? Integer
-      keep_score['dealer_points'] += card
-    end
-  end
+  players = keep_score['player_card_values'].select \
+            { |card| card.is_a? Integer }
+  dealers = keep_score['dealer_card_values'].select \
+            { |card| card.is_a? Integer }
+
+  players.each { |num| keep_score['player_points'] += num }
+  dealers.each { |num| keep_score['dealer_points'] += num }
 end
 add_integer_points(keep_score)
 
-def convert_player_aces(keep_score)
-  keep_score['player_card_values'].each do |card|
-    if card == 'ace'
-      keep_score['player_points'] += 11
-    end
-  end
-  keep_score['player_card_values'].select \
-    { |value| value == 'ace' }.count.times do
+def convert_aces(keep_score)
+  players = keep_score['player_card_values'].select { |card| card == "ace" }
+  dealers = keep_score['dealer_card_values'].select { |card| card == "ace" }
+
+  keep_score['player_points'] += players.length * 11
+  keep_score['dealer_points'] += dealers.length * 11
+
+  players.length.times do
     keep_score['player_points'] -= 10 if keep_score['player_points'] > 21
   end
-end
-convert_player_aces(keep_score)
 
-def convert_dealer_aces(keep_score)
-  keep_score['dealer_card_values'].each do |card|
-    if card == 'ace'
-      keep_score['dealer_points'] += 11
-    end
-  end
-  keep_score['dealer_card_values'].select \
-    { |value| value == 'ace' }.count.times do
+  dealers.length.times do
     keep_score['dealer_points'] -= 10 if keep_score['dealer_points'] > 21
   end
 end
-convert_dealer_aces(keep_score)
+convert_aces(keep_score)
 
-# ---- PLAYER LOOP ----
 def show_player_all_cards(keep_score)
   system('clear') || system('cls')
   puts "Here's your cards player: "
@@ -183,7 +163,6 @@ def show_dealer_all_cards(keep_score)
   puts "                        "
 end
 
-# ---- SCORE CHECK SECTION ----
 def tie_game(keep_score)
   if keep_score['dealer_move'] == 'stay'
     if keep_score['player_points'] == keep_score['dealer_points']
@@ -275,13 +254,12 @@ def show_dealer_points(keep_score)
   puts "        "
 end
 
-# ----- ASK PLAYER NEXT MOVE & HIT LOOP ----
 def player_hit_loop(keep_score, deck_of_cards)
   player_dealt_one_card(keep_score, deck_of_cards)
   get_current_card_value(keep_score)
   convert_face_cards(keep_score)
   add_integer_points(keep_score)
-  convert_player_aces(keep_score)
+  convert_aces(keep_score)
   show_player_all_cards(keep_score)
   show_dealer_first_card(keep_score)
   score_check_player_turn(keep_score)
@@ -332,14 +310,12 @@ def dealer_hit_loop(keep_score, deck_of_cards)
   get_current_card_value(keep_score)
   convert_face_cards(keep_score)
   add_integer_points(keep_score)
-  convert_player_aces(keep_score)
-  convert_dealer_aces(keep_score)
+  convert_aces(keep_score)
   show_dealer_all_cards(keep_score)
   show_dealer_points(keep_score)
   display_score_update(keep_score)
 end
 
-### This was dealer_stays
 def calculate_winner(keep_score)
   keep_score['dealer_move'] = 'stay'
   puts "The dealer has decided to stay."
@@ -381,7 +357,6 @@ def display_winner_dealer_loop(keep_score)
     puts "You win player! Your #{keep_score['player_points']} points " \
     "beats out the dealer's #{keep_score['dealer_points']} points."
     keep_score['end_game'] = true
-
   end
 end
 
@@ -422,15 +397,13 @@ def place_cards_back_in_deck_and_shuffle(deck_of_cards, card_suits, card_values)
   shuffle!(deck_of_cards)
 end
 
-#### Make this a game loop and refactor
 def play_again_loop(keep_score, deck_of_cards, card_suits, card_values)
   place_cards_back_in_deck_and_shuffle(deck_of_cards, card_suits, card_values)
   deal_first_two_cards_to_each_user(deck_of_cards, keep_score)
   get_current_card_value(keep_score)
   convert_face_cards(keep_score)
   add_integer_points(keep_score)
-  convert_player_aces(keep_score)
-  convert_dealer_aces(keep_score)
+  convert_aces(keep_score)
   show_player_all_cards(keep_score)
   show_dealer_first_card(keep_score)
   show_player_points(keep_score)
