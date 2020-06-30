@@ -25,6 +25,7 @@ keep_score = { 'player_cards' => [], \
                'dealer_score' => 0, \
                'tie_score' => 0, \
                'rounds_played' => 0, \
+               'end_round' => false, \
                'end_game' => false }
 
 deck_of_cards = []
@@ -33,7 +34,7 @@ def welcome
   system('clear') || system('cls')
   puts "Welcome to Twenty-One!"
   puts "        "
-  puts "First to win #{TOTAL_ROUNDS} wins the game."
+  puts "First to win #{TOTAL_ROUNDS} rounds wins the game."
   puts "        "
   puts "The dealer is shuffling the deck and will soon hand out two cards each."
   sleep 5
@@ -182,7 +183,7 @@ def tie_game(keep_score)
   if keep_score['dealer_move'] == 'stay'
     if keep_score['player_points'] == keep_score['dealer_points']
       keep_score['dealer_move'] = 'tie'
-      keep_score['end_game'] = true
+      keep_score['end_round'] = true
       keep_score['tie_score'] += 1
     end
   end
@@ -191,7 +192,7 @@ end
 def dealer_blackjack(keep_score)
   if keep_score['dealer_points'] == BLACKJACK
     keep_score['dealer_move'] = 'blackjack'
-    keep_score['end_game'] = true
+    keep_score['end_round'] = true
     keep_score['dealer_score'] += 1
   end
 end
@@ -199,11 +200,11 @@ end
 def busted(keep_score)
   if keep_score['player_points'] > BLACKJACK
     keep_score['player_move'] = 'bust'
-    keep_score['end_game'] = true
+    keep_score['end_round'] = true
     keep_score['dealer_score'] += 1
   elsif keep_score['dealer_points'] > BLACKJACK
     keep_score['dealer_move'] = 'bust'
-    keep_score['end_game'] = true
+    keep_score['end_round'] = true
     keep_score['player_score'] += 1
   end
 end
@@ -214,11 +215,11 @@ def score_check_player_turn(keep_score)
 
   if keep_score['player_points'] == BLACKJACK
     keep_score['player_move'] = 'win'
-    keep_score['end_game'] = true
+    keep_score['end_round'] = true
     keep_score['player_score'] += 1
   elsif keep_score['dealer_points'] == BLACKJACK
     keep_score['player_move'] = 'lose'
-    keep_score['end_game'] = true
+    keep_score['end_round'] = true
     keep_score['dealer_score'] += 1
   end
 end
@@ -242,19 +243,19 @@ def dealer_win_or_lose(keep_score)
      DEALER_HITS_UNTIL && keep_score['dealer_move'] == 'stay'
     if keep_score['player_points'] < keep_score['dealer_points']
       keep_score['dealer_move'] = 'win'
-      keep_score['end_game'] = true
+      keep_score['end_round'] = true
       keep_score['dealer_score'] += 1
     elsif keep_score['player_points'] > keep_score['dealer_points']
       keep_score['dealer_move'] = 'lose'
-      keep_score['end_game'] = true
-      keep_score['player_score'] += 1 
+      keep_score['end_round'] = true
+      keep_score['player_score'] += 1
     end
   end
 end
 
 def end_game_check(keep_score)
   if keep_score['player_move'] != ''
-    keep_score['end_game'] = true
+    keep_score['end_round'] = true
   end
 end
 end_game_check(keep_score)
@@ -281,7 +282,8 @@ def show_dealer_points(keep_score)
   puts "----------"
   puts "You currently have #{keep_score['player_points']} points"
   puts "The dealer has #{keep_score['dealer_points']} points"
-  puts "        "
+  sleep 5
+  system('clear') || system('cls')
 end
 
 def player_hit_loop(keep_score, deck_of_cards)
@@ -335,7 +337,7 @@ ask_player_next_move(keep_score, deck_of_cards)
 
 def dealer_hit_loop(keep_score, deck_of_cards)
   puts "The dealer is drawing another card now..."
-  sleep 5
+  sleep 3
   system('clear') || system('cls')
   dealer_dealt_one_card(keep_score, deck_of_cards)
   get_current_card_value(keep_score)
@@ -350,11 +352,11 @@ end
 
 def calculate_winner(keep_score)
   keep_score['dealer_move'] = 'stay'
-  if keep_score['dealer_points'] <= 21
+  if keep_score['dealer_points'] < 21
     puts "The dealer has decided to stay."
+    sleep 3
   end
-  sleep 3
-  system('clear') || system('cls')
+  # system('clear') || system('cls')
   puts "Let's see if we have a winner. Calculating scores..."
   puts "                  "
   busted(keep_score)
@@ -366,14 +368,14 @@ end
 def display_dealer_blackjack(keep_score)
   if keep_score['dealer_move'] == 'blackjack'
     puts "Blackjack! The dealer has won the game. Better luck next time!"
-    keep_score['end_game'] = true
+    keep_score['end_round'] = true
   end
 end
 
 def display_tie_game(keep_score)
   if keep_score['dealer_move'] == 'tie'
     puts "It's a tie game!"
-    keep_score['end_game'] = true
+    keep_score['end_round'] = true
   end
 end
 
@@ -381,21 +383,19 @@ def display_winner_dealer_loop(keep_score)
   if keep_score['dealer_move'] == 'bust'
     puts "You win! The dealer busts with #{keep_score['dealer_points']} " \
     "points compared to your #{keep_score['player_points']}."
-    keep_score['end_game'] = true
-    sleep 3
+    keep_score['end_round'] = true
 
   elsif keep_score['dealer_move'] == 'win'
     puts "The dealer wins! The dealer's #{keep_score['dealer_points']} points" \
     " beats out your #{keep_score['player_points']} points."
-    keep_score['end_game'] = true
-    sleep 3
+    keep_score['end_round'] = true
 
   elsif keep_score['dealer_move'] == 'lose'
     puts "You win player! Your #{keep_score['player_points']} points " \
     "beats out the dealer's #{keep_score['dealer_points']} points."
-    keep_score['end_game'] = true
-    sleep 3
+    keep_score['end_round'] = true
   end
+  sleep 3
 end
 
 def dealer_under_seventeen_check(keep_score, deck_of_cards)
@@ -417,7 +417,7 @@ def dealer_under_seventeen_check(keep_score, deck_of_cards)
 end
 dealer_under_seventeen_check(keep_score, deck_of_cards)
 
-def clear_hash(keep_score)
+def clear_hash_end_round(keep_score)
   keep_score['player_cards'] = []
   keep_score['dealer_cards'] = []
   keep_score['player_card_values'] = []
@@ -426,6 +426,14 @@ def clear_hash(keep_score)
   keep_score['dealer_points'] = 0
   keep_score['player_move'] = ''
   keep_score['dealer_move'] = ''
+  keep_score['end_round'] = false
+end
+
+def clear_hash_end_game(keep_score)
+  keep_score['player_score'] = 0
+  keep_score['dealer_score'] = 0
+  keep_score['tie_score'] = 0
+  keep_score['rounds_played'] = 0
   keep_score['end_game'] = false
 end
 
@@ -455,44 +463,63 @@ end
 
 def score_update(keep_score)
   system('clear') || system('cls')
-  puts "Number of Rounds Won:"
-  puts "--------------------"
+  puts "End of Round Scoreboard:"
+  puts "-----------------------"
   puts "Player: #{keep_score['player_score']}"
   puts "Dealer: #{keep_score['dealer_score']}"
+  puts "Tie Games: #{keep_score['tie_score']}"
+  puts "Total Rounds Played: #{keep_score['rounds_played']}"
   puts "      "
-  puts "First to win #{TOTAL_ROUNDS} rounds wins the games!"
+  puts "Remember: First to win #{TOTAL_ROUNDS} rounds wins the game!"
   sleep 3
 end
-score_update(keep_score)
 
 def begin_next_round(keep_score, deck_of_cards, card_suits, card_values)
-  while keep_score['rounds_played'] < TOTAL_ROUNDS
-    # keep_score['end_game'] == ''
+  until keep_score['player_score'] == TOTAL_ROUNDS || \
+        keep_score['dealer_score'] == TOTAL_ROUNDS
     keep_score['rounds_played'] += 1
     sleep 5
     system('clear') || system('cls')
     score_update(keep_score)
     puts "Round #{keep_score['rounds_played'] + 1} coming right up!"
     sleep 3
-    clear_hash(keep_score)
+    clear_hash_end_round(keep_score)
     play_again_loop(keep_score, deck_of_cards, card_suits, card_values)
   end
 end
 begin_next_round(keep_score, deck_of_cards, card_suits, card_values)
 
+def game_winner_prompt(keep_score)
+  if keep_score['player_score'] == TOTAL_ROUNDS
+    system('clear') || system('cls')
+    puts "Player wins the game! " \
+    "Your #{keep_score['player_score']} wins beats " \
+    "the dealer's #{keep_score['dealer_score']}"
+    keep_score['end_game'] == true
+  elsif keep_score['dealer_score'] == TOTAL_ROUNDS
+    system('clear') || system('cls')
+    puts "Sorry player, you lost the game :( " \
+    "The dealer's #{keep_score['dealer_score']} wins beats out " \
+    "your #{keep_score['player_score']} wins."
+    keep_score['end_game'] == true
+  end
+  sleep 3
+end
+game_winner_prompt(keep_score)
+
 def end_game_prompt(keep_score, deck_of_cards, card_suits, card_values)
-  while keep_score['end_game'] == true && \
-        keep_score['rounds_played'] == TOTAL_ROUNDS
+  while keep_score['end_game'] == true
     puts "            "
-    puts "Game over! Would you like to play again? (y or n)"
+    puts "Would you like to play again? (y or n)"
     answer = gets.chomp
     if answer.downcase == ('y') || answer.downcase == ('yes')
       puts "New game staring soon!"
       sleep 3
-      clear_hash(keep_score)
+      clear_hash_end_round(keep_score)
+      clear_hash_end_game(keep_score)
       play_again_loop(keep_score, deck_of_cards, card_suits, card_values)
     else
-      keep_score['end_game'] = ''
+      keep_score['end_game'] = true
       puts "Thanks for playing Twenty One! Goodbye!"
     end
   end
