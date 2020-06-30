@@ -182,6 +182,8 @@ def tie_game(keep_score)
   if keep_score['dealer_move'] == 'stay'
     if keep_score['player_points'] == keep_score['dealer_points']
       keep_score['dealer_move'] = 'tie'
+      keep_score['end_game'] = true
+      keep_score['tie_score'] += 1
     end
   end
 end
@@ -190,14 +192,19 @@ def dealer_blackjack(keep_score)
   if keep_score['dealer_points'] == BLACKJACK
     keep_score['dealer_move'] = 'blackjack'
     keep_score['end_game'] = true
+    keep_score['dealer_score'] += 1
   end
 end
 
 def busted(keep_score)
   if keep_score['player_points'] > BLACKJACK
     keep_score['player_move'] = 'bust'
+    keep_score['end_game'] = true
+    keep_score['dealer_score'] += 1
   elsif keep_score['dealer_points'] > BLACKJACK
     keep_score['dealer_move'] = 'bust'
+    keep_score['end_game'] = true
+    keep_score['player_score'] += 1
   end
 end
 
@@ -206,9 +213,13 @@ def score_check_player_turn(keep_score)
   busted(keep_score)
 
   if keep_score['player_points'] == BLACKJACK
-    keep_score["player_move"] = 'win'
+    keep_score['player_move'] = 'win'
+    keep_score['end_game'] = true
+    keep_score['player_score'] += 1
   elsif keep_score['dealer_points'] == BLACKJACK
-    keep_score["player_move"] = 'lose'
+    keep_score['player_move'] = 'lose'
+    keep_score['end_game'] = true
+    keep_score['dealer_score'] += 1
   end
 end
 score_check_player_turn(keep_score)
@@ -232,9 +243,11 @@ def dealer_win_or_lose(keep_score)
     if keep_score['player_points'] < keep_score['dealer_points']
       keep_score['dealer_move'] = 'win'
       keep_score['end_game'] = true
+      keep_score['dealer_score'] += 1
     elsif keep_score['player_points'] > keep_score['dealer_points']
       keep_score['dealer_move'] = 'lose'
       keep_score['end_game'] = true
+      keep_score['player_score'] += 1 
     end
   end
 end
@@ -337,8 +350,11 @@ end
 
 def calculate_winner(keep_score)
   keep_score['dealer_move'] = 'stay'
-  puts "The dealer has decided to stay."
-  puts "                  "
+  if keep_score['dealer_points'] <= 21
+    puts "The dealer has decided to stay."
+  end
+  sleep 3
+  system('clear') || system('cls')
   puts "Let's see if we have a winner. Calculating scores..."
   puts "                  "
   busted(keep_score)
@@ -366,16 +382,19 @@ def display_winner_dealer_loop(keep_score)
     puts "You win! The dealer busts with #{keep_score['dealer_points']} " \
     "points compared to your #{keep_score['player_points']}."
     keep_score['end_game'] = true
+    sleep 3
 
   elsif keep_score['dealer_move'] == 'win'
     puts "The dealer wins! The dealer's #{keep_score['dealer_points']} points" \
     " beats out your #{keep_score['player_points']} points."
     keep_score['end_game'] = true
+    sleep 3
 
   elsif keep_score['dealer_move'] == 'lose'
     puts "You win player! Your #{keep_score['player_points']} points " \
     "beats out the dealer's #{keep_score['dealer_points']} points."
     keep_score['end_game'] = true
+    sleep 3
   end
 end
 
@@ -434,12 +453,25 @@ def play_again_loop(keep_score, deck_of_cards, card_suits, card_values)
   dealer_under_seventeen_check(keep_score, deck_of_cards)
 end
 
+def score_update(keep_score)
+  system('clear') || system('cls')
+  puts "Number of Rounds Won:"
+  puts "--------------------"
+  puts "Player: #{keep_score['player_score']}"
+  puts "Dealer: #{keep_score['dealer_score']}"
+  puts "      "
+  puts "First to win #{TOTAL_ROUNDS} rounds wins the games!"
+  sleep 3
+end
+score_update(keep_score)
+
 def begin_next_round(keep_score, deck_of_cards, card_suits, card_values)
   while keep_score['rounds_played'] < TOTAL_ROUNDS
     # keep_score['end_game'] == ''
     keep_score['rounds_played'] += 1
     sleep 5
     system('clear') || system('cls')
+    score_update(keep_score)
     puts "Round #{keep_score['rounds_played'] + 1} coming right up!"
     sleep 3
     clear_hash(keep_score)
@@ -452,7 +484,7 @@ def end_game_prompt(keep_score, deck_of_cards, card_suits, card_values)
   while keep_score['end_game'] == true && \
         keep_score['rounds_played'] == TOTAL_ROUNDS
     puts "            "
-    puts "Would you like to play again? (y or n)"
+    puts "Game over! Would you like to play again? (y or n)"
     answer = gets.chomp
     if answer.downcase == ('y') || answer.downcase == ('yes')
       puts "New game staring soon!"
