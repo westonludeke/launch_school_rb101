@@ -528,7 +528,7 @@ def end_game_prompt(keep_score, deck_of_cards, card_suits, card_values)
     clear_hash_end_game(keep_score)
     play_game_again_loop(keep_score, deck_of_cards, card_suits, card_values)
 
-  break if answer.downcase == ('n') || answer.downcase == ('no')
+    break if answer.downcase == ('n') || answer.downcase == ('no')
     keep_score['end_game'] = true
   end
   puts "Thanks for playing Twenty One! Goodbye!"
