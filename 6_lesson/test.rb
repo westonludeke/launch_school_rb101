@@ -466,7 +466,7 @@ def score_update(keep_score)
   puts "Player wins: #{keep_score['player_rounds_won']}"
   puts "Dealer wins: #{keep_score['dealer_rounds_won']}"
   puts "Tie Games: #{keep_score['tie_games_number']}"
-  puts "Total Rounds Played: #{keep_score['rounds_played']}"
+  puts "Rounds Played: #{keep_score['rounds_played']}"
   sleep 3
 end
 
