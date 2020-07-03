@@ -510,7 +510,6 @@ def game_winner_prompt(keep_score, deck_of_cards, card_suits, card_values)
     keep_score['end_game'] = true
     end_game_prompt(keep_score, deck_of_cards, card_suits, card_values)
   end
-  sleep 3
 end
 
 def play_game_again_loop(keep_score, deck_of_cards, card_suits, card_values)
@@ -531,7 +530,7 @@ def end_game_prompt(keep_score, deck_of_cards, card_suits, card_values)
 
   if answer.downcase == ('y') || answer.downcase == ('yes')
     play_game_again_loop(keep_score, deck_of_cards, card_suits, card_values)
-  else 
+  else
     puts "Thanks for playing Twenty One! Goodbye!"
   end
 end
