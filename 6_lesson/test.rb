@@ -332,6 +332,7 @@ end
 ask_player_next_move(keep_score, deck_of_cards)
 
 def dealer_hit_loop(keep_score, deck_of_cards)
+  puts "  "
   puts "The dealer is drawing another card now..."
   sleep 3
   system('clear') || system('cls')
@@ -353,9 +354,9 @@ def calculate_winner(keep_score)
     puts "The dealer has decided to stay."
     sleep 3
   end
+  system('clear') || system('cls')
   puts "Let's see if we have a winner. Calculating scores..."
   sleep 3
-  system('clear') || system('cls')
   busted(keep_score)
   dealer_blackjack(keep_score)
   tie_game(keep_score)
@@ -462,8 +463,8 @@ def score_update(keep_score)
   system('clear') || system('cls')
   puts "End of Round Scoreboard:"
   puts "-----------------------"
-  puts "Player: #{keep_score['player_rounds_won']}"
-  puts "Dealer: #{keep_score['dealer_rounds_won']}"
+  puts "Player wins: #{keep_score['player_rounds_won']}"
+  puts "Dealer wins: #{keep_score['dealer_rounds_won']}"
   puts "Tie Games: #{keep_score['tie_games_number']}"
   puts "Total Rounds Played: #{keep_score['rounds_played']}"
   sleep 3
@@ -524,7 +525,9 @@ def end_game_prompt(keep_score, deck_of_cards, card_suits, card_values)
   if answer.downcase == ('y') || answer.downcase == ('yes')
     play_game_again_loop(keep_score, deck_of_cards, card_suits, card_values)
   else
+    system('clear') || system('cls')
     puts "Thanks for playing Twenty One! Goodbye!"
+    puts "  "
   end
 end
 
