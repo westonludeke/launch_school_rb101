@@ -1,10 +1,5 @@
 # Twenty-One
 
-### TO-DO LIST ###
-
-# 1. Check all method names and improving naming convention if needed
-# 2. Upload to separate GitHub Repo
-
 BLACKJACK = 21
 DEALER_HITS_UNTIL = 17
 TOTAL_ROUNDS = 2
@@ -16,8 +11,8 @@ keep_score = { 'player_cards' => [], \
                'dealer_cards' => [], \
                'player_card_values' => [], \
                'dealer_card_values' => [], \
-               'player_current_round_points' => 0, \
-               'dealer_current_round_points' => 0, \
+               'player_points' => 0, \
+               'dealer_points' => 0, \
                'player_move' => '', \
                'dealer_move' => '', \
                'player_rounds_won' => 0, \
@@ -90,16 +85,16 @@ end
 get_current_card_value(keep_score)
 
 def convert_face_cards(keep_score)
-  keep_score['player_current_round_points'] = 0
-  keep_score['dealer_current_round_points'] = 0
+  keep_score['player_points'] = 0
+  keep_score['dealer_points'] = 0
 
   players = keep_score['player_card_values'].select \
             { |card| card == "jack" || card == "queen" || card == "king" }
   dealers = keep_score['dealer_card_values'].select \
             { |card| card == "jack" || card == "queen" || card == "king" }
 
-  keep_score['player_current_round_points'] = players.length * 10
-  keep_score['dealer_current_round_points'] = dealers.length * 10
+  keep_score['player_points'] = players.length * 10
+  keep_score['dealer_points'] = dealers.length * 10
 end
 convert_face_cards(keep_score)
 
@@ -109,8 +104,8 @@ def add_integer_points(keep_score)
   dealers = keep_score['dealer_card_values'].select \
             { |card| card.is_a? Integer }
 
-  players.each { |num| keep_score['player_current_round_points'] += num }
-  dealers.each { |num| keep_score['dealer_current_round_points'] += num }
+  players.each { |num| keep_score['player_points'] += num }
+  dealers.each { |num| keep_score['dealer_points'] += num }
 end
 add_integer_points(keep_score)
 
@@ -118,8 +113,8 @@ def convert_aces(keep_score)
   players = keep_score['player_card_values'].select { |card| card == "ace" }
   dealers = keep_score['dealer_card_values'].select { |card| card == "ace" }
 
-  keep_score['player_current_round_points'] += players.length * 11
-  keep_score['dealer_current_round_points'] += dealers.length * 11
+  keep_score['player_points'] += players.length * 11
+  keep_score['dealer_points'] += dealers.length * 11
 end
 convert_aces(keep_score)
 
@@ -128,11 +123,11 @@ def reduce_ace_to_one(keep_score)
   dealers = keep_score['dealer_card_values'].select { |card| card == "ace" }
 
   players.length.times do
-    keep_score['player_current_round_points'] -= 10 if keep_score['player_current_round_points'] > BLACKJACK
+    keep_score['player_points'] -= 10 if keep_score['player_points'] > BLACKJACK
   end
 
   dealers.length.times do
-    keep_score['dealer_current_round_points'] -= 10 if keep_score['dealer_current_round_points'] > BLACKJACK
+    keep_score['dealer_points'] -= 10 if keep_score['dealer_points'] > BLACKJACK
   end
 end
 reduce_ace_to_one(keep_score)
@@ -179,7 +174,7 @@ end
 
 def tie_game(keep_score)
   if keep_score['dealer_move'] == 'stay'
-    if keep_score['player_current_round_points'] == keep_score['dealer_current_round_points']
+    if keep_score['player_points'] == keep_score['dealer_points']
       keep_score['dealer_move'] = 'tie'
       keep_score['end_round'] = true
       keep_score['tie_games_number'] += 1
@@ -188,7 +183,7 @@ def tie_game(keep_score)
 end
 
 def dealer_blackjack(keep_score)
-  if keep_score['dealer_current_round_points'] == BLACKJACK
+  if keep_score['dealer_points'] == BLACKJACK
     keep_score['dealer_move'] = 'blackjack'
     keep_score['end_round'] = true
     keep_score['dealer_rounds_won'] += 1
@@ -196,11 +191,11 @@ def dealer_blackjack(keep_score)
 end
 
 def busted(keep_score)
-  if keep_score['player_current_round_points'] > BLACKJACK
+  if keep_score['player_points'] > BLACKJACK
     keep_score['player_move'] = 'bust'
     keep_score['end_round'] = true
     keep_score['dealer_rounds_won'] += 1
-  elsif keep_score['dealer_current_round_points'] > BLACKJACK
+  elsif keep_score['dealer_points'] > BLACKJACK
     keep_score['dealer_move'] = 'bust'
     keep_score['end_round'] = true
     keep_score['player_rounds_won'] += 1
@@ -211,11 +206,11 @@ def score_check_player_turn(keep_score)
   tie_game(keep_score)
   busted(keep_score)
 
-  if keep_score['player_current_round_points'] == BLACKJACK
+  if keep_score['player_points'] == BLACKJACK
     keep_score['player_move'] = 'win'
     keep_score['end_round'] = true
     keep_score['player_rounds_won'] += 1
-  elsif keep_score['dealer_current_round_points'] == BLACKJACK
+  elsif keep_score['dealer_points'] == BLACKJACK
     keep_score['player_move'] = 'lose'
     keep_score['end_round'] = true
     keep_score['dealer_rounds_won'] += 1
@@ -233,20 +228,20 @@ def display_score_update(keep_score)
   elsif keep_score["player_move"] == 'lose'
     puts "The dealer has Blackjack! Sorry player, you lose."
   elsif keep_score["player_move"] == 'bust'
-    puts "Sorry player. At #{keep_score['player_current_round_points']} points you've busted!"
+    puts "Sorry player. At #{keep_score['player_points']} points you've busted!"
   end
   sleep 3
 end
 display_score_update(keep_score)
 
 def dealer_win_or_lose(keep_score)
-  if keep_score['dealer_current_round_points'] >= \
+  if keep_score['dealer_points'] >= \
      DEALER_HITS_UNTIL && keep_score['dealer_move'] == 'stay'
-    if keep_score['player_current_round_points'] < keep_score['dealer_current_round_points']
+    if keep_score['player_points'] < keep_score['dealer_points']
       keep_score['dealer_move'] = 'win'
       keep_score['end_round'] = true
       keep_score['dealer_rounds_won'] += 1
-    elsif keep_score['player_current_round_points'] > keep_score['dealer_current_round_points']
+    elsif keep_score['player_points'] > keep_score['dealer_points']
       keep_score['dealer_move'] = 'lose'
       keep_score['end_round'] = true
       keep_score['player_rounds_won'] += 1
@@ -262,28 +257,28 @@ end
 end_game_check(keep_score)
 
 def clear_player_move(keep_score)
-  if keep_score['player_current_round_points'] < \
+  if keep_score['player_points'] < \
      BLACKJACK && keep_score["player_move"] == 'hit'
     keep_score["player_move"] = ''
   end
 end
 
-def show_player_current_round_points(keep_score)
+def show_player_points(keep_score)
   if keep_score["player_move"] == ''
     puts "        "
     puts "Scoreboard:"
     puts "----------"
-    puts "You have #{keep_score['player_current_round_points']} points"
+    puts "You have #{keep_score['player_points']} points"
     puts "        "
   end
 end
-show_player_current_round_points(keep_score)
+show_player_points(keep_score)
 
-def show_dealer_current_round_points(keep_score)
+def show_dealer_points(keep_score)
   puts "Scoreboard:"
   puts "----------"
-  puts "You currently have #{keep_score['player_current_round_points']} points"
-  puts "The dealer has #{keep_score['dealer_current_round_points']} points"
+  puts "You currently have #{keep_score['player_points']} points"
+  puts "The dealer has #{keep_score['dealer_points']} points"
   sleep 5
 end
 
@@ -298,7 +293,7 @@ def player_hit_loop(keep_score, deck_of_cards)
   show_dealer_first_card(keep_score)
   score_check_player_turn(keep_score)
   clear_player_move(keep_score)
-  show_player_current_round_points(keep_score)
+  show_player_points(keep_score)
   display_score_update(keep_score)
   end_game_check(keep_score)
 end
@@ -347,13 +342,13 @@ def dealer_hit_loop(keep_score, deck_of_cards)
   convert_aces(keep_score)
   reduce_ace_to_one(keep_score)
   show_dealer_all_cards(keep_score)
-  show_dealer_current_round_points(keep_score)
+  show_dealer_points(keep_score)
   display_score_update(keep_score)
 end
 
 def calculate_winner(keep_score)
   keep_score['dealer_move'] = 'stay'
-  if keep_score['dealer_current_round_points'] < 21
+  if keep_score['dealer_points'] < 21
     puts "    "
     puts "The dealer has decided to stay."
     sleep 3
@@ -383,18 +378,18 @@ end
 
 def display_winner_dealer_loop(keep_score)
   if keep_score['dealer_move'] == 'bust'
-    puts "You win! The dealer busts with #{keep_score['dealer_current_round_points']} " \
-    "points compared to your #{keep_score['player_current_round_points']}."
+    puts "You win! The dealer busts with #{keep_score['dealer_points']} " \
+    "points compared to your #{keep_score['player_points']}."
     keep_score['end_round'] = true
 
   elsif keep_score['dealer_move'] == 'win'
-    puts "The dealer wins! The dealer's #{keep_score['dealer_current_round_points']} points" \
-    " beats out your #{keep_score['player_current_round_points']} points."
+    puts "The dealer wins! The dealer's #{keep_score['dealer_points']} points" \
+    " beats out your #{keep_score['player_points']} points."
     keep_score['end_round'] = true
 
   elsif keep_score['dealer_move'] == 'lose'
-    puts "You win player! Your #{keep_score['player_current_round_points']} points " \
-    "beats out the dealer's #{keep_score['dealer_current_round_points']} points."
+    puts "You win player! Your #{keep_score['player_points']} points " \
+    "beats out the dealer's #{keep_score['dealer_points']} points."
     keep_score['end_round'] = true
   end
   sleep 3
@@ -403,13 +398,13 @@ end
 def dealer_under_seventeen_check(keep_score, deck_of_cards)
   if keep_score["player_move"] == 'stay'
     show_dealer_all_cards(keep_score)
-    show_dealer_current_round_points(keep_score)
+    show_dealer_points(keep_score)
 
-    while keep_score['dealer_current_round_points'] < DEALER_HITS_UNTIL
+    while keep_score['dealer_points'] < DEALER_HITS_UNTIL
       dealer_hit_loop(keep_score, deck_of_cards)
     end
 
-    if keep_score['dealer_current_round_points'] >= DEALER_HITS_UNTIL
+    if keep_score['dealer_points'] >= DEALER_HITS_UNTIL
       calculate_winner(keep_score)
       display_winner_dealer_loop(keep_score)
       display_dealer_blackjack(keep_score)
@@ -424,8 +419,8 @@ def clear_hash_end_round(keep_score)
   keep_score['dealer_cards'] = []
   keep_score['player_card_values'] = []
   keep_score['dealer_card_values'] = []
-  keep_score['player_current_round_points'] = 0
-  keep_score['dealer_current_round_points'] = 0
+  keep_score['player_points'] = 0
+  keep_score['dealer_points'] = 0
   keep_score['player_move'] = ''
   keep_score['dealer_move'] = ''
   keep_score['end_round'] = false
@@ -455,7 +450,7 @@ def play_another_round_loop(keep_score, deck_of_cards, card_suits, card_values)
   reduce_ace_to_one(keep_score)
   show_player_all_cards(keep_score)
   show_dealer_first_card(keep_score)
-  show_player_current_round_points(keep_score)
+  show_player_points(keep_score)
   score_check_player_turn(keep_score)
   display_score_update(keep_score)
   end_game_check(keep_score)
