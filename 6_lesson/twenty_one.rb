@@ -1,10 +1,8 @@
 # Twenty-One
 
-=begin ---- TODO LIST----
+### TO-DO LIST ###
 
-1. Let's see if we have a winner blank
-
-=end
+# 1. Check all method names and improving naming convention if needed
 
 BLACKJACK = 21
 DEALER_HITS_UNTIL = 17
@@ -160,7 +158,6 @@ def show_dealer_first_card(keep_score)
   puts "#{keep_score['dealer_cards'][0][1]} of "\
   "#{keep_score['dealer_cards'][0][0]} "
   puts "1 unknown card."
-  # puts "                        "
 end
 show_dealer_first_card(keep_score)
 
