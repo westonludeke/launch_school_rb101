@@ -1,5 +1,89 @@
 # Twenty-One
 
+=begin ----FEEDBACK FROM SRDAN----
+
+1. You have a bug in your code. The first round I have won with blackjack just with dealt cards (Ace and King). In the second round, I couldn't choose to hit or stay so only my dealt cards were counted. Then in the third round I was able to continue playing normally.
+
+
+2. I entered YADA when prompted if I want to play another game and the game ended. For better user experience you should only allow certain inputs as valid y and n in this case (case-insensitive). All other inputs should be considered invalid.
+
+a. [Weston's Note] - This should check for invalid entries. 
+
+
+3. keep_score hash is not just tracking score but a lot of other things so the variable name is misleading. Also, I am not sure what is the purpose of tracking so many things in this hash?
+
+You could have score ={ player:0, dealer:0} and that should be enough.
+
+
+4. As far as the code organization, it would be better to keep methods at the top and method calls below it. It was hard to follow the game logic when there was a method definition, and then a method call.
+
+
+5. The main data structure decision for this program is around how to represent the deck and cards. I think an array is fine for the deck, but the cards would work better as hashes for improved clarity when interacting with the cards.
+
+Consider get_current_card_value. You need to know that [1] represents the value of the card. This requires implicit knowledge of the card structure. It's better to make that interaction explicit in your code by using a different structure. For example:
+
+{ suit: 'hearts', value: '9'}
+
+This would lead to a much clearer interaction:
+  
+  keep_score['dealer_cards'].each do |card|
+    keep_score['dealer_card_values'] << card.value
+  end
+
+
+6. add_integer_points method name could be improved. I didn't know what this method does. From the implementation it just calculates total points?
+
+
+7. You have a lot of code duplication. Generally, we want to find methods that do similar/same thing and extract them into just one method.
+For example show_dealer_all_cards and show_player_all_cards are almost identical. 
+
+
+8. With so many properties of keep score it was hard to read many methods. For example busted? method could just be:
+
+def busted?(total)
+  total > 21
+end
+
+Your method is also increasing the score and we want the methods to do only one thing. In this case, this method should just test whether someone busted.
+
+In the case that you want the method to have some orchestration functionality (i.e. player turn), then this method would consist just of some other method calls. So even though this method seemingly does multiple things, they are all realated and it "orchestrates" player turn behavior.
+
+
+9. score_check_player_turn also does multiple things, mainly increasing the round points, but again, the logic if the conditionals is very hard to follow.
+
+
+10. dealer_win_or_lose suffers from the similar complex logic, and score is updated here as well.
+
+
+
+11. player_hit_loop is a good example of orchestration method and it is implemented relatively well. However, it could be simplified:
+
+def player_hit_loop(keep_score, deck_of_cards)
+  player_dealt_one_card(keep_score, deck_of_cards)
+  calculate_total_cards_value
+  display_cards
+  show_player_points(keep_score)
+  display_score(keep_score)
+end
+
+I didn't add arguments. Basically, you just need to deal player a card, calculate total value, display cards and display values and that is it when player hits. Even end_game_check shouldn't be there.
+
+
+12. Since dealer_hit_loop is basically the same, you could just rename the method to hit_loop and pass a string that signifies whose turn is it.
+
+
+----OVERALL----
+
+Good work on the working implementation, Weston. :thumbsup: I am not sure if you have checked the solution before starting to work on this app. If you haven't I would advise you to do that as it would be better to start from the proposed solution and then try to improve it by implementing bonus points requirements.
+
+The code, as it is, was hard to read. It had a lot of code duplication and methods were doing multiple things.
+
+One thing that you can also do, to try to improve your solution is to check other students solutions especially, the ones that implemented similar features as yours.
+
+I hope this helps.
+
+=end
+
 BLACKJACK = 21
 DEALER_HITS_UNTIL = 17
 TOTAL_ROUNDS = 2
