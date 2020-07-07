@@ -4,9 +4,8 @@ VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 BLACKJACK = 21
 DEALER_HITS_UNTIL = 17
 
-
 def prompt(msg)
-  puts "=> #{msg}"
+  puts msg.to_s
 end
 
 def initialize_deck
@@ -97,14 +96,20 @@ loop do
     dealer_cards << deck.pop
   end
 
+  # initalize score vars
+  player_total = total(player_cards)
+  dealer_total = total(dealer_cards)
+
+  prompt "  "
   prompt "Dealer has #{dealer_cards[0]} and ?"
   prompt "You have: #{player_cards[0]} and #{player_cards[1]}, " \
-         "for a total of #{total(player_cards)}."
+         "for a total of #{player_total}."
 
   # player turn
   loop do
     player_turn = nil
     loop do
+      prompt "  "
       prompt "Would you like to (h)it or (s)tay?"
       player_turn = gets.chomp.downcase
       break if ['h', 's'].include?(player_turn)
@@ -113,10 +118,12 @@ loop do
 
     if player_turn == 'h'
       player_cards << deck.pop
+      player_total = total(player_cards)
       system('clear') || system('cls')
+
       prompt "You chose to hit!"
       prompt "Your cards are now: #{player_cards}"
-      prompt "Your total is now: #{total(player_cards)}"
+      prompt "Your total is now: #{player_total}"
     end
 
     break if player_turn == 's' || busted?(player_cards)
@@ -126,32 +133,34 @@ loop do
     display_result(dealer_cards, player_cards)
     play_again? ? next : break
   else
-    prompt "You stayed at #{total(player_cards)}"
+    prompt "You stayed at #{player_total}"
+    puts "  "
   end
 
   # dealer turn
   prompt "Dealer turn..."
 
   loop do
-    break if total(dealer_cards) >= DEALER_HITS_UNTIL
+    break if dealer_total >= DEALER_HITS_UNTIL
 
     prompt "Dealer hits!"
     dealer_cards << deck.pop
+    dealer_total = total(dealer_cards)
     prompt "Dealer's cards are now: #{dealer_cards}"
   end
 
   if busted?(dealer_cards)
-    prompt "Dealer total is now: #{total(dealer_cards)}"
+    prompt "Dealer total is now: #{dealer_total}"
     display_result(dealer_cards, player_cards)
     play_again? ? next : break
   else
-    prompt "Dealer stays at #{total(dealer_cards)}"
+    prompt "Dealer stays at #{dealer_total}"
   end
 
   # both player and dealer stays - compare cards!
   puts "=============="
-  prompt "Dealer has #{dealer_cards}, for a total of: #{total(dealer_cards)}"
-  prompt "Player has #{player_cards}, for a total of: #{total(player_cards)}"
+  prompt "Dealer has #{dealer_cards}, for a total of: #{dealer_total}"
+  prompt "Player has #{player_cards}, for a total of: #{player_total}"
   puts "=============="
 
   display_result(dealer_cards, player_cards)
@@ -159,4 +168,5 @@ loop do
   break unless play_again?
 end
 
+system('clear') || system('cls')
 prompt "Thank you for playing Twenty-One! Good bye!"
