@@ -4,6 +4,19 @@ VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 BLACKJACK = 21
 DEALER_HITS_UNTIL = 17
 
+score = { 'player_total' => 0, \
+          'dealer_total' => 0, \
+          'player_wins' => 0, \
+          'dealer_wins' => 0, \
+          'tie_games' => 0 }
+
+# Change how many rounds you'd like to play below:
+rounds = { 'rounds_played' => 0, \
+           'rounds_needed_to_win' => 2 }
+
+bust_checker = { 'player_busts' => false, \
+                 'dealer_busts' => false }
+
 def prompt(msg)
   puts msg.to_s
 end
@@ -74,98 +87,203 @@ def display_result(dealer_cards, player_cards)
   end
 end
 
-def play_again?
+def update_score_end_of_round(dealer_cards, player_cards, score, rounds)
+  result = detect_result(dealer_cards, player_cards)
+  rounds['rounds_played'] += 1
+
+  case result
+  when :player_busted
+    score['dealer_wins'] += 1
+  when :dealer_busted
+    score['player_wins'] += 1
+  when :player
+    score['player_wins'] += 1
+  when :dealer
+    score['dealer_wins'] += 1
+  when :tie
+    score['tie_games'] += 1
+  end
+end
+
+def display_score(score)
+  prompt "The player has #{score['player_wins']} wins."
+  prompt "The dealer has #{score['dealer_wins']} wins."
+  prompt "There have been #{score['tie_games']} ties."
+end
+
+def display_winner(score, rounds)
+  if score['player_wins'] == rounds['rounds_needed_to_win']
+    prompt "Player wins the game!"
+  elsif score['dealer_wins'] == rounds['rounds_needed_to_win']
+    prompt "Dealer wins the game!"
+  end
+end
+
+def play_again?(rounds, score)
   puts "-------------"
   prompt "Do you want to play again? (y or n)"
   answer = gets.chomp
   answer.downcase.start_with?('y')
+
+  if answer.downcase.start_with?('y')
+    rounds['rounds_played'] = 0
+    score['player_wins'] = 0
+    score['dealer_wins'] = 0
+    score['tie_games'] = 0
+  end
+end
+
+def display_bust(dealer_cards, player_cards, score, rounds)
+  if bust_checker['player_busts'] == true
+
+    display_result(dealer_cards, player_cards)
+    update_score_end_of_round(dealer_cards, player_cards, score, rounds)
+    display_score(score)
+
+    prompt "Player busts round: #{rounds}"
+    prompt "Player total: #{score['player_total']}"
+    prompt "Dealer total: #{score['dealer_total']}"
+  end
 end
 
 loop do
   system('clear') || system('cls')
   prompt "Welcome to Twenty-One!"
 
-  # initialize vars
-  deck = initialize_deck
-  player_cards = []
-  dealer_cards = []
-
-  # initial deal
-  2.times do
-    player_cards << deck.pop
-    dealer_cards << deck.pop
-  end
-
-  # initalize score vars
-  player_total = total(player_cards)
-  dealer_total = total(dealer_cards)
-
-  prompt "  "
-  prompt "Dealer has #{dealer_cards[0]} and ?"
-  prompt "You have: #{player_cards[0]} and #{player_cards[1]}, " \
-         "for a total of #{player_total}."
-
-  # player turn
-  loop do
-    player_turn = nil
-    loop do
-      prompt "  "
-      prompt "Would you like to (h)it or (s)tay?"
-      player_turn = gets.chomp.downcase
-      break if ['h', 's'].include?(player_turn)
-      prompt "Sorry, must enter 'h' or 's'."
-    end
-
-    if player_turn == 'h'
-      player_cards << deck.pop
-      player_total = total(player_cards)
-      system('clear') || system('cls')
-
-      prompt "You chose to hit!"
-      prompt "Your cards are now: #{player_cards}"
-      prompt "Your total is now: #{player_total}"
-    end
-
-    break if player_turn == 's' || busted?(player_cards)
-  end
-
-  if busted?(player_cards)
-    display_result(dealer_cards, player_cards)
-    play_again? ? next : break
-  else
-    prompt "You stayed at #{player_total}"
+  until (score['player_wins'] == rounds['rounds_needed_to_win']) || \
+        (score['dealer_wins'] == rounds['rounds_needed_to_win'])
+    sleep 3
+    system('clear') || system('cls')
+    prompt "Welcome to round #{rounds['rounds_played'] + 1}!"
     puts "  "
-  end
+    prompt "Player has #{score['player_wins']} wins"
+    prompt "Dealer has #{score['dealer_wins']} wins"
+    prompt "There have been #{score['tie_games']} ties"
+    sleep 3
 
-  # dealer turn
-  prompt "Dealer turn..."
+    # initialize vars
+    deck = initialize_deck
+    player_cards = []
+    dealer_cards = []
 
-  loop do
-    break if dealer_total >= DEALER_HITS_UNTIL
+    # initial deal
+    2.times do
+      player_cards << deck.pop
+      dealer_cards << deck.pop
+    end
 
-    prompt "Dealer hits!"
-    dealer_cards << deck.pop
+    # initalize score vars
+    player_total = total(player_cards)
     dealer_total = total(dealer_cards)
-    prompt "Dealer's cards are now: #{dealer_cards}"
-  end
 
-  if busted?(dealer_cards)
-    prompt "Dealer total is now: #{dealer_total}"
+    prompt "  "
+    prompt "Dealer has #{dealer_cards[0]} and ?"
+    prompt "You have: #{player_cards[0]} and #{player_cards[1]}, " \
+           "for a total of #{player_total}."
+
+    # player turn
+    loop do
+      player_turn = nil
+      loop do
+        prompt "  "
+        prompt "Would you like to (h)it or (s)tay?"
+        player_turn = gets.chomp.downcase
+        break if ['h', 's'].include?(player_turn)
+        prompt "Sorry, must enter 'h' or 's'."
+      end
+
+      if player_turn == 'h'
+        player_cards << deck.pop
+        player_total = total(player_cards)
+        system('clear') || system('cls')
+
+        prompt "You chose to hit!"
+        prompt "Your cards are now: #{player_cards}"
+        prompt "Your total is now: #{player_total}"
+      end
+
+      break if player_turn == 's' || busted?(player_cards)
+    end
+
+    if busted?(player_cards)
+      display_result(dealer_cards, player_cards)
+      update_score_end_of_round(dealer_cards, player_cards, score, rounds)
+      display_score(score)
+      bust_checker['player_busts'] = true
+
+      prompt "Player total: #{player_total}"
+      prompt "Dealer total: #{dealer_total}"
+
+      if score['player_wins'] < rounds['rounds_needed_to_win'] && \
+         score['dealer_wins'] < rounds['rounds_needed_to_win']
+        player_total = 0
+        dealer_total = 0
+        next
+      elsif score['player_wins'] == rounds['rounds_needed_to_win'] || \
+            score['dealer_wins'] == rounds['rounds_needed_to_win']
+        play_again?(rounds, score) ? next : break
+      end
+    else
+      prompt "You stayed at #{player_total}"
+      puts "  "
+    end
+
+    # dealer turn
+    prompt "Dealer turn..."
+
+    loop do
+      break if dealer_total >= DEALER_HITS_UNTIL
+
+      prompt "Dealer hits!"
+      dealer_cards << deck.pop
+      dealer_total = total(dealer_cards)
+      prompt "Dealer's cards are now: #{dealer_cards}"
+    end
+
+    if busted?(dealer_cards)
+      prompt "Dealer total is now: #{dealer_total}"
+      display_result(dealer_cards, player_cards)
+      update_score_end_of_round(dealer_cards, player_cards, score, rounds)
+      display_score(score)
+      bust_checker['dealer_busts'] = true
+
+      if score['player_wins'] < rounds['rounds_needed_to_win'] && \
+         score['dealer_wins'] < rounds['rounds_needed_to_win']
+        player_total = 0
+        dealer_total = 0
+        next
+      elsif score['player_wins'] == rounds['rounds_needed_to_win'] || \
+            score['dealer_wins'] == rounds['rounds_needed_to_win']
+        play_again?(rounds, score) ? next : break
+      end
+    else
+      prompt "Dealer stays at #{dealer_total}"
+    end
+
+    # both player and dealer stays - compare cards!
+    puts "=============="
+    prompt "Dealer has #{dealer_cards}, for a total of: #{dealer_total}"
+    prompt "Player has #{player_cards}, for a total of: #{player_total}"
+    puts "=============="
+
     display_result(dealer_cards, player_cards)
-    play_again? ? next : break
-  else
-    prompt "Dealer stays at #{dealer_total}"
+    update_score_end_of_round(dealer_cards, player_cards, score, rounds)
+    display_score(score)
+    display_winner(score, rounds)
+    prompt "  "
+    prompt "This is the end of round #{rounds['rounds_played']}"
+    sleep 3
   end
 
-  # both player and dealer stays - compare cards!
-  puts "=============="
-  prompt "Dealer has #{dealer_cards}, for a total of: #{dealer_total}"
-  prompt "Player has #{player_cards}, for a total of: #{player_total}"
-  puts "=============="
+  player_total = 0
+  dealer_total = 0
 
-  display_result(dealer_cards, player_cards)
+  unless bust_checker['player_busts'] == true || \
+         bust_checker['dealer_busts'] == true
+    answer = play_again?(rounds, score)
+  end
 
-  break unless play_again?
+  break unless answer == 'y'
 end
 
 system('clear') || system('cls')
